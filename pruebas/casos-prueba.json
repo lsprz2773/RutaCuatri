@@ -1,0 +1,978 @@
+{
+ "casos_especiales": [
+  {
+   "id": "T01",
+   "nombre": "Mini ejemplo de 5 materias",
+   "malla": "mini",
+   "parametros": {
+    "Cnorm": 8,
+    "Cmax": 10,
+    "beta": 0.2,
+    "K": 7
+   },
+   "inicio": {
+    "aprobadas": [],
+    "periodo": "Sep"
+   },
+   "meta": [
+    "C",
+    "E",
+    "R",
+    "S",
+    "I"
+   ],
+   "esperado": {
+    "costo": 4.4,
+    "cuatrimestres": 4,
+    "h_inicio": 3
+   },
+   "materias_mini": [
+    {
+     "clave": "C",
+     "nombre": "Cálculo",
+     "creditos": 6,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "E",
+     "nombre": "Estadística",
+     "creditos": 4,
+     "nivel": 2,
+     "prerrequisitos": [
+      "C"
+     ],
+     "oferta": [
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "R",
+     "nombre": "Redes",
+     "creditos": 6,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "S",
+     "nombre": "Seguridad",
+     "creditos": 6,
+     "nivel": 2,
+     "prerrequisitos": [
+      "R"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "I",
+     "nombre": "Inglés",
+     "creditos": 4,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    }
+   ]
+  },
+  {
+   "id": "T02",
+   "nombre": "Meta ya cumplida",
+   "malla": "ISW",
+   "parametros": {
+    "Cnorm": 30,
+    "Cmax": 36,
+    "beta": 0.1,
+    "K": 7
+   },
+   "inicio": {
+    "aprobadas": [
+     "ISW01",
+     "ISW03",
+     "ISW06",
+     "ISW08",
+     "ISW10",
+     "ISW12",
+     "ISW26",
+     "ISW27"
+    ],
+    "periodo": "Sep"
+   },
+   "meta": "ISW-M3",
+   "esperado": {
+    "costo": 0,
+    "cuatrimestres": 0
+   }
+  },
+  {
+   "id": "T03",
+   "nombre": "Materia necesaria sin oferta",
+   "malla": "ISW",
+   "parametros": {
+    "Cnorm": 30,
+    "Cmax": 36,
+    "beta": 0.1,
+    "K": 7
+   },
+   "inicio": {
+    "aprobadas": [],
+    "periodo": "Sep"
+   },
+   "meta": "ISW-M1",
+   "esperado": {
+    "costo": null,
+    "motivo": "ISW23 no se abre en ningún periodo; lo detecta la validación"
+   },
+   "modificacion": {
+    "ISW23": {
+     "oferta": []
+    }
+   }
+  },
+  {
+   "id": "T04",
+   "nombre": "Materia más pesada que la carga máxima",
+   "malla": "ISW",
+   "parametros": {
+    "Cnorm": 20,
+    "Cmax": 26,
+    "beta": 0.1,
+    "K": 7
+   },
+   "inicio": {
+    "aprobadas": [],
+    "periodo": "Sep"
+   },
+   "meta": "ISW-M1",
+   "esperado": {
+    "costo": null,
+    "motivo": "ISW28 Estadía tiene 30 créditos y Cmax = 26; lo detecta la validación"
+   }
+  },
+  {
+   "id": "T05",
+   "nombre": "Plan con un cuatrimestre sin inscripción",
+   "malla": "ISW",
+   "parametros": {
+    "Cnorm": 30,
+    "Cmax": 36,
+    "beta": 0.1,
+    "K": 7
+   },
+   "inicio": {
+    "aprobadas": [
+     "ISW01",
+     "ISW02",
+     "ISW03",
+     "ISW04",
+     "ISW05",
+     "ISW06",
+     "ISW07",
+     "ISW08",
+     "ISW09",
+     "ISW10",
+     "ISW11",
+     "ISW12",
+     "ISW13",
+     "ISW14",
+     "ISW15",
+     "ISW16",
+     "ISW17",
+     "ISW18",
+     "ISW19",
+     "ISW20",
+     "ISW21",
+     "ISW22",
+     "ISW23"
+    ],
+    "periodo": "Ene"
+   },
+   "meta": "ISW-M1",
+   "esperado": {
+    "costo": 4.0,
+    "cuatrimestres": 4,
+    "plan": [
+     {
+      "periodo": "Ene",
+      "materias": [
+       "ISW28"
+      ],
+      "creditos": 30,
+      "costo": 1.0
+     },
+     {
+      "periodo": "May",
+      "materias": [],
+      "creditos": 0,
+      "costo": 1.0
+     },
+     {
+      "periodo": "Sep",
+      "materias": [
+       "ISW24"
+      ],
+      "creditos": 6,
+      "costo": 1.0
+     },
+     {
+      "periodo": "Ene",
+      "materias": [
+       "ISW25"
+      ],
+      "creditos": 6,
+      "costo": 1.0
+     }
+    ]
+   }
+  }
+ ],
+ "escenarios": [
+  {
+   "id": "G01",
+   "perfil": "regular",
+   "alumno": "ISW-E1",
+   "meta": "ISW-M1",
+   "h_inicio": 6,
+   "costo_optimo": 6.4,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 4
+  },
+  {
+   "id": "G02",
+   "perfil": "regular",
+   "alumno": "ISW-E1",
+   "meta": "ISW-M2",
+   "h_inicio": 5,
+   "costo_optimo": 5.0,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G03",
+   "perfil": "regular",
+   "alumno": "ISW-E1",
+   "meta": "ISW-M3",
+   "h_inicio": 4,
+   "costo_optimo": 5.0,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G04",
+   "perfil": "regular",
+   "alumno": "ISW-E2",
+   "meta": "ISW-M1",
+   "h_inicio": 4,
+   "costo_optimo": 4.2,
+   "cuatrimestres": 4,
+   "creditos_sobrecarga": 2
+  },
+  {
+   "id": "G05",
+   "perfil": "regular",
+   "alumno": "ISW-E2",
+   "meta": "ISW-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G06",
+   "perfil": "regular",
+   "alumno": "ISW-E2",
+   "meta": "ISW-M3",
+   "h_inicio": 2,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G07",
+   "perfil": "regular",
+   "alumno": "ISW-E3",
+   "meta": "ISW-M1",
+   "h_inicio": 4,
+   "costo_optimo": 5.0,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G08",
+   "perfil": "regular",
+   "alumno": "ISW-E3",
+   "meta": "ISW-M2",
+   "h_inicio": 3,
+   "costo_optimo": 4.0,
+   "cuatrimestres": 4,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G09",
+   "perfil": "regular",
+   "alumno": "ISW-E3",
+   "meta": "ISW-M3",
+   "h_inicio": 4,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G10",
+   "perfil": "regular",
+   "alumno": "ISW-E4",
+   "meta": "ISW-M1",
+   "h_inicio": 4,
+   "costo_optimo": 4.0,
+   "cuatrimestres": 4,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G11",
+   "perfil": "regular",
+   "alumno": "ISW-E4",
+   "meta": "ISW-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G12",
+   "perfil": "regular",
+   "alumno": "ISW-E4",
+   "meta": "ISW-M3",
+   "h_inicio": 2,
+   "costo_optimo": 2.0,
+   "cuatrimestres": 2,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G13",
+   "perfil": "regular",
+   "alumno": "IRC-E1",
+   "meta": "IRC-M1",
+   "h_inicio": 6,
+   "costo_optimo": 6.4,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 4
+  },
+  {
+   "id": "G14",
+   "perfil": "regular",
+   "alumno": "IRC-E1",
+   "meta": "IRC-M2",
+   "h_inicio": 5,
+   "costo_optimo": 5.2,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 2
+  },
+  {
+   "id": "G15",
+   "perfil": "regular",
+   "alumno": "IRC-E1",
+   "meta": "IRC-M3",
+   "h_inicio": 5,
+   "costo_optimo": 5.0,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G16",
+   "perfil": "regular",
+   "alumno": "IRC-E2",
+   "meta": "IRC-M1",
+   "h_inicio": 4,
+   "costo_optimo": 4.3,
+   "cuatrimestres": 4,
+   "creditos_sobrecarga": 3
+  },
+  {
+   "id": "G17",
+   "perfil": "regular",
+   "alumno": "IRC-E2",
+   "meta": "IRC-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.1,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 1
+  },
+  {
+   "id": "G18",
+   "perfil": "regular",
+   "alumno": "IRC-E2",
+   "meta": "IRC-M3",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G19",
+   "perfil": "regular",
+   "alumno": "IRC-E3",
+   "meta": "IRC-M1",
+   "h_inicio": 6,
+   "costo_optimo": 7.0,
+   "cuatrimestres": 7,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G20",
+   "perfil": "regular",
+   "alumno": "IRC-E3",
+   "meta": "IRC-M2",
+   "h_inicio": 5,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G21",
+   "perfil": "regular",
+   "alumno": "IRC-E3",
+   "meta": "IRC-M3",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G22",
+   "perfil": "regular",
+   "alumno": "IRC-E4",
+   "meta": "IRC-M1",
+   "h_inicio": 4,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G23",
+   "perfil": "regular",
+   "alumno": "IRC-E4",
+   "meta": "IRC-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G24",
+   "perfil": "regular",
+   "alumno": "IRC-E4",
+   "meta": "IRC-M3",
+   "h_inicio": 2,
+   "costo_optimo": 2.0,
+   "cuatrimestres": 2,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G25",
+   "perfil": "regular",
+   "alumno": "ICD-E1",
+   "meta": "ICD-M1",
+   "h_inicio": 6,
+   "costo_optimo": 6.4,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 4
+  },
+  {
+   "id": "G26",
+   "perfil": "regular",
+   "alumno": "ICD-E1",
+   "meta": "ICD-M2",
+   "h_inicio": 5,
+   "costo_optimo": 5.1,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 1
+  },
+  {
+   "id": "G27",
+   "perfil": "regular",
+   "alumno": "ICD-E1",
+   "meta": "ICD-M3",
+   "h_inicio": 5,
+   "costo_optimo": 5.0,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G28",
+   "perfil": "regular",
+   "alumno": "ICD-E2",
+   "meta": "ICD-M1",
+   "h_inicio": 4,
+   "costo_optimo": 4.3,
+   "cuatrimestres": 4,
+   "creditos_sobrecarga": 3
+  },
+  {
+   "id": "G29",
+   "perfil": "regular",
+   "alumno": "ICD-E2",
+   "meta": "ICD-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G30",
+   "perfil": "regular",
+   "alumno": "ICD-E2",
+   "meta": "ICD-M3",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G31",
+   "perfil": "regular",
+   "alumno": "ICD-E3",
+   "meta": "ICD-M1",
+   "h_inicio": 6,
+   "costo_optimo": 7.0,
+   "cuatrimestres": 7,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G32",
+   "perfil": "regular",
+   "alumno": "ICD-E3",
+   "meta": "ICD-M2",
+   "h_inicio": 5,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G33",
+   "perfil": "regular",
+   "alumno": "ICD-E3",
+   "meta": "ICD-M3",
+   "h_inicio": 5,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G34",
+   "perfil": "regular",
+   "alumno": "ICD-E4",
+   "meta": "ICD-M1",
+   "h_inicio": 4,
+   "costo_optimo": 4.0,
+   "cuatrimestres": 4,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G35",
+   "perfil": "regular",
+   "alumno": "ICD-E4",
+   "meta": "ICD-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G36",
+   "perfil": "regular",
+   "alumno": "ICD-E4",
+   "meta": "ICD-M3",
+   "h_inicio": 2,
+   "costo_optimo": 2.0,
+   "cuatrimestres": 2,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G37",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E1",
+   "meta": "ISW-M1",
+   "h_inicio": 7,
+   "costo_optimo": 8.5,
+   "cuatrimestres": 7,
+   "creditos_sobrecarga": 15
+  },
+  {
+   "id": "G38",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E1",
+   "meta": "ISW-M2",
+   "h_inicio": 5,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G39",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E1",
+   "meta": "ISW-M3",
+   "h_inicio": 4,
+   "costo_optimo": 5.0,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G40",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E2",
+   "meta": "ISW-M1",
+   "h_inicio": 5,
+   "costo_optimo": 5.6,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 6
+  },
+  {
+   "id": "G41",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E2",
+   "meta": "ISW-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.8,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 8
+  },
+  {
+   "id": "G42",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E2",
+   "meta": "ISW-M3",
+   "h_inicio": 2,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G43",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E3",
+   "meta": "ISW-M1",
+   "h_inicio": 5,
+   "costo_optimo": 6.6,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 6
+  },
+  {
+   "id": "G44",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E3",
+   "meta": "ISW-M2",
+   "h_inicio": 4,
+   "costo_optimo": 4.2,
+   "cuatrimestres": 4,
+   "creditos_sobrecarga": 2
+  },
+  {
+   "id": "G45",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E3",
+   "meta": "ISW-M3",
+   "h_inicio": 4,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G46",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E4",
+   "meta": "ISW-M1",
+   "h_inicio": 4,
+   "costo_optimo": 4.7,
+   "cuatrimestres": 4,
+   "creditos_sobrecarga": 7
+  },
+  {
+   "id": "G47",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E4",
+   "meta": "ISW-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G48",
+   "perfil": "medio_tiempo",
+   "alumno": "ISW-E4",
+   "meta": "ISW-M3",
+   "h_inicio": 2,
+   "costo_optimo": 2.0,
+   "cuatrimestres": 2,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G49",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E1",
+   "meta": "IRC-M1",
+   "h_inicio": 7,
+   "costo_optimo": 8.6,
+   "cuatrimestres": 7,
+   "creditos_sobrecarga": 16
+  },
+  {
+   "id": "G50",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E1",
+   "meta": "IRC-M2",
+   "h_inicio": 5,
+   "costo_optimo": 6.1,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 1
+  },
+  {
+   "id": "G51",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E1",
+   "meta": "IRC-M3",
+   "h_inicio": 5,
+   "costo_optimo": 5.0,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G52",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E2",
+   "meta": "IRC-M1",
+   "h_inicio": 5,
+   "costo_optimo": 5.6,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 6
+  },
+  {
+   "id": "G53",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E2",
+   "meta": "IRC-M2",
+   "h_inicio": 3,
+   "costo_optimo": 4.0,
+   "cuatrimestres": 4,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G54",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E2",
+   "meta": "IRC-M3",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G55",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E3",
+   "meta": "IRC-M1",
+   "h_inicio": 6,
+   "costo_optimo": 7.6,
+   "cuatrimestres": 7,
+   "creditos_sobrecarga": 6
+  },
+  {
+   "id": "G56",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E3",
+   "meta": "IRC-M2",
+   "h_inicio": 5,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G57",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E3",
+   "meta": "IRC-M3",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G58",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E4",
+   "meta": "IRC-M1",
+   "h_inicio": 4,
+   "costo_optimo": 6.6,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 6
+  },
+  {
+   "id": "G59",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E4",
+   "meta": "IRC-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G60",
+   "perfil": "medio_tiempo",
+   "alumno": "IRC-E4",
+   "meta": "IRC-M3",
+   "h_inicio": 2,
+   "costo_optimo": 2.0,
+   "cuatrimestres": 2,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G61",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E1",
+   "meta": "ICD-M1",
+   "h_inicio": 7,
+   "costo_optimo": 8.5,
+   "cuatrimestres": 7,
+   "creditos_sobrecarga": 15
+  },
+  {
+   "id": "G62",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E1",
+   "meta": "ICD-M2",
+   "h_inicio": 5,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G63",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E1",
+   "meta": "ICD-M3",
+   "h_inicio": 5,
+   "costo_optimo": 5.0,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G64",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E2",
+   "meta": "ICD-M1",
+   "h_inicio": 5,
+   "costo_optimo": 5.6,
+   "cuatrimestres": 5,
+   "creditos_sobrecarga": 6
+  },
+  {
+   "id": "G65",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E2",
+   "meta": "ICD-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.9,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 9
+  },
+  {
+   "id": "G66",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E2",
+   "meta": "ICD-M3",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G67",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E3",
+   "meta": "ICD-M1",
+   "h_inicio": 6,
+   "costo_optimo": 7.6,
+   "cuatrimestres": 7,
+   "creditos_sobrecarga": 6
+  },
+  {
+   "id": "G68",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E3",
+   "meta": "ICD-M2",
+   "h_inicio": 5,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G69",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E3",
+   "meta": "ICD-M3",
+   "h_inicio": 5,
+   "costo_optimo": 6.0,
+   "cuatrimestres": 6,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G70",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E4",
+   "meta": "ICD-M1",
+   "h_inicio": 4,
+   "costo_optimo": 4.6,
+   "cuatrimestres": 4,
+   "creditos_sobrecarga": 6
+  },
+  {
+   "id": "G71",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E4",
+   "meta": "ICD-M2",
+   "h_inicio": 3,
+   "costo_optimo": 3.0,
+   "cuatrimestres": 3,
+   "creditos_sobrecarga": 0
+  },
+  {
+   "id": "G72",
+   "perfil": "medio_tiempo",
+   "alumno": "ICD-E4",
+   "meta": "ICD-M3",
+   "h_inicio": 2,
+   "costo_optimo": 2.0,
+   "cuatrimestres": 2,
+   "creditos_sobrecarga": 0
+  }
+ ]
+}

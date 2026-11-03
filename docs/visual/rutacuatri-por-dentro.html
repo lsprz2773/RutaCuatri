@@ -1,0 +1,530 @@
+<title>RutaCuatri por dentro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: una columna de lectura; cada sección es un "banco de trabajo": diagrama arriba o a la izquierda, explicación junto o debajo; se apila en celular. */
+:root{
+  --bg:#F3F4F6; --panel:#FFFFFF; --ink:#16191F; --muted:#4D5562; --line:#D5DAE1; --soft:#E9EDF3;
+  --accent:#1F4FD1; --accent-soft:#E3EAFB; --accent-ink:#FFFFFF;
+  --warn:#A64A0A; --warn-soft:#FBEBDD;
+  --ok:#2C6B34; --ok-soft:#E2F1E3;
+  --gray-node:#C7CDD6; --grid:#E2E6EC;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --ease:cubic-bezier(.22,.8,.26,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12151B; --panel:#1B1F27; --ink:#E8EBF0; --muted:#A8B0BC; --line:#343A46; --soft:#252A34;
+  --accent:#7EA2FF; --accent-soft:#233257; --accent-ink:#0E1424;
+  --warn:#F2A465; --warn-soft:#3A2717;
+  --ok:#7FCB88; --ok-soft:#1D3321;
+  --gray-node:#4A5160; --grid:#222733; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151B; --panel:#1B1F27; --ink:#E8EBF0; --muted:#A8B0BC; --line:#343A46; --soft:#252A34;
+  --accent:#7EA2FF; --accent-soft:#233257; --accent-ink:#0E1424;
+  --warn:#F2A465; --warn-soft:#3A2717;
+  --ok:#7FCB88; --ok-soft:#1D3321;
+  --gray-node:#4A5160; --grid:#222733; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,4.2vw,44px);letter-spacing:-0.01em}
+h2{font-size:28px}
+h3{font-size:19px}
+p{margin:0}
+.lede{color:var(--muted);max-width:70ch;font-size:17px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.mono{font-family:var(--f-mono)}
+.bench{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:18px}
+.row{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start}
+.row>.diagram{flex:3 1 520px;min-width:0}
+.row>.explain{flex:2 1 320px;min-width:0;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-size:15px;min-height:44px;padding:8px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button[disabled]{opacity:.45;cursor:default}
+.dots{display:flex;flex-wrap:wrap;gap:6px}
+.dots button{min-width:44px;padding:8px 0;font-family:var(--f-mono);font-size:14px}
+.dots button[aria-current="step"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.counter{font-family:var(--f-mono);font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+input[type=range]{flex:1 1 200px;accent-color:var(--accent);min-height:44px}
+.card{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel)}
+.note{color:var(--muted);font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500}
+tr.pick td{background:var(--accent-soft);font-weight:600}
+.formula{font-family:var(--f-mono);font-size:15px;background:var(--soft);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+.plan{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.plan>div{border:1px solid var(--line);border-radius:8px;padding:10px;font-size:14px}
+.plan .per{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.plan .over{border-color:var(--warn);background:var(--warn-soft)}
+@media (max-width:560px){.plan{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* --- Animaciones de la explicación (ambas secciones) --- */
+.swap-next{animation:inR .45s var(--ease) both}
+.swap-prev{animation:inL .45s var(--ease) both}
+@keyframes inR{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+@keyframes inL{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+.stagger>*{animation:rise .45s var(--ease) both}
+.stagger>*:nth-child(2){animation-delay:.06s}.stagger>*:nth-child(3){animation-delay:.12s}.stagger>*:nth-child(4){animation-delay:.18s}.stagger>*:nth-child(5){animation-delay:.24s}.stagger>*:nth-child(n+6){animation-delay:.3s}
+.stagger tbody tr{animation:rise .4s var(--ease) both}
+.stagger tbody tr:nth-child(2){animation-delay:.12s}.stagger tbody tr:nth-child(3){animation-delay:.2s}.stagger tbody tr:nth-child(4){animation-delay:.28s}.stagger tbody tr:nth-child(5){animation-delay:.36s}.stagger tbody tr:nth-child(n+6){animation-delay:.44s}
+.stagger .plan>div{animation:rise .45s var(--ease) both}
+.stagger .plan>div:nth-child(2){animation-delay:.12s}.stagger .plan>div:nth-child(3){animation-delay:.24s}.stagger .plan>div:nth-child(4){animation-delay:.36s}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* --- Diagrama de flujo --- */
+#flow text{font-family:var(--f-body);fill:var(--ink);transition:fill .35s}
+#flow .box{fill:var(--panel);stroke:var(--line);stroke-width:1.5;transition:fill .35s,stroke .35s}
+#flow .lbl{font-size:13px;font-weight:600}
+#flow .sub{font-size:11px;fill:var(--muted)}
+#flow .edge{stroke:var(--muted);stroke-width:1.5;fill:none;transition:stroke .3s}
+#flow .ah{fill:var(--muted)}
+#flow .elbl{font-size:11px;fill:var(--muted)}
+#flow .num{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
+#flow g.on .box{fill:var(--accent);stroke:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+#flow g.on text{fill:var(--accent-ink)}
+#flow g.done .box{fill:var(--accent-soft);stroke:var(--accent)}
+#flow .edge.on{stroke:var(--warn);stroke-width:2.5;stroke-dasharray:7 5;animation:march .7s linear infinite}
+#flow .elbl.on{fill:var(--warn);font-weight:600}
+#flow #token{fill:var(--warn);stroke:var(--panel);stroke-width:2.5}
+@keyframes pulse{0%,100%{stroke-width:1.5}50%{stroke-width:5}}
+@keyframes march{to{stroke-dashoffset:-24}}
+
+/* --- Árbol: lienzo con arrastre y zoom --- */
+.viewport{position:relative;height:min(560px,70vh);border:1px solid var(--line);border-radius:12px;overflow:hidden;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;
+  background-color:var(--bg);background-image:radial-gradient(var(--grid) 1.2px,transparent 1.3px);background-size:22px 22px}
+.viewport.dragging{cursor:grabbing}
+.viewport svg{width:100%;height:100%;display:block}
+.zoombar{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.zoombar button{min-width:44px;padding:6px 10px;background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.zoomlvl{position:absolute;left:12px;bottom:10px;font-family:var(--f-mono);font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:2px 8px;z-index:2}
+.hint{position:absolute;left:12px;top:12px;font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 8px;z-index:2;max-width:calc(100% - 90px)}
+.follow{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);min-height:44px}
+.follow input{width:18px;height:18px;accent-color:var(--accent)}
+#tree text{font-family:var(--f-mono);fill:var(--ink);transition:fill .35s}
+#tree .n rect.b{stroke-width:1.5;transition:fill .4s,stroke .4s,stroke-width .4s}
+#tree .st-frontera rect.b{fill:var(--panel);stroke:var(--accent);stroke-width:2}
+#tree .st-expandido rect.b{fill:var(--accent-soft);stroke:var(--accent)}
+#tree .st-actual rect.b{fill:var(--accent);stroke:var(--accent)}
+#tree .st-actual text{fill:var(--accent-ink)}
+#tree .st-podado rect.b{fill:var(--soft);stroke:var(--gray-node);stroke-dasharray:4 3}
+#tree .st-podado text,#tree .st-repetido text{fill:var(--muted)}
+#tree .st-repetido rect.b{fill:var(--soft);stroke:var(--gray-node)}
+#tree .st-meta rect.b{fill:var(--ok-soft);stroke:var(--ok);stroke-width:3}
+#tree .tag{font-size:10px;font-weight:600}
+#tree .n.appear .inner{animation:pop .5s var(--ease) both}
+#tree .n.leave .inner{animation:fade .25s ease both}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
+@keyframes fade{to{opacity:0}}
+#tree .inner{transform-box:fill-box;transform-origin:center}
+#tree .e{stroke:var(--line);stroke-width:1.5;fill:none;transition:stroke .4s,stroke-width .4s}
+#tree .e.appear{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .55s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+#tree .e.path{stroke:var(--ok);stroke-width:3.5}
+#tree .el{font-size:10px;fill:var(--muted);transition:fill .4s,opacity .4s}
+#tree .el.appear{animation:fadein .4s .3s both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+#tree .el.path{fill:var(--ok);font-weight:600}
+#tree #cursor{fill:none;stroke:var(--warn);stroke-width:3.5;transition:transform .55s var(--ease),stroke .3s,opacity .3s}
+#tree #cursor.meta{stroke:var(--ok)}
+#tree #cursor.descartar{stroke:var(--gray-node)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:18px;height:14px;border-radius:4px;border:2px solid;display:inline-block}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+#tree-explain{min-height:9em;overflow:hidden}
+.fr-row-new td{animation:flash 1s ease}
+@keyframes flash{from{background:var(--warn-soft)}to{background:transparent}}
+footer{color:var(--muted);font-size:14px;max-width:75ch}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <span class="eyebrow">Proyecto 3 · Anytime A*</span>
+    <h1>RutaCuatri por dentro</h1>
+    <p class="lede">Cómo el planificador pasa de un historial académico a un plan de cuatrimestres, con un ejemplo reducido del caso de Ana: 5 materias pendientes, créditos a escala y cada paso tomado de una ejecución real del algoritmo.</p>
+  </header>
+
+  <section class="bench" aria-labelledby="t-flow" id="sec-flow" tabindex="-1">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span class="eyebrow">Parte 1</span>
+      <h2 id="t-flow">Funcionamiento, paso a paso</h2>
+      <p class="note">Usa los botones o las flechas del teclado para avanzar. El punto naranja recorre el diagrama hasta la etapa en la que estás.</p>
+    </div>
+    <div class="controls">
+      <button type="button" id="f-prev">Anterior</button>
+      <button type="button" id="f-next" class="primary">Siguiente</button>
+      <div class="dots" id="f-dots" role="group" aria-label="Ir al paso"></div>
+    </div>
+    <div class="row">
+      <div class="diagram scroll">
+        <svg id="flow" viewBox="0 0 910 240" style="width:100%;min-width:680px;height:auto" role="img" aria-label="Diagrama de flujo del planificador: datos, estado inicial, heurística, generar sucesores, elegir el de menor f, comprobar meta, guardar plan, decidir si bajar H y plan óptimo">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="ah"/></marker>
+          </defs>
+          <path class="edge" d="M140 57H163" marker-end="url(#ar)"/>
+          <path class="edge" d="M295 57H318" marker-end="url(#ar)"/>
+          <path class="edge" d="M450 57H473" marker-end="url(#ar)"/>
+          <path class="edge" d="M605 57H628" marker-end="url(#ar)"/>
+          <path class="edge" d="M760 57H778" marker-end="url(#ar)"/>
+          <path class="edge" id="e-si" d="M835 91V161" marker-end="url(#ar)"/>
+          <text class="elbl" id="l-si" x="843" y="130">sí</text>
+          <path class="edge" id="e-no" d="M835 23V10H540V28" marker-end="url(#ar)"/>
+          <text class="elbl" id="l-no" x="600" y="22">no: siguiente de la frontera</text>
+          <path class="edge" d="M770 190H672" marker-end="url(#ar)"/>
+          <path class="edge" id="e-bajar" d="M610 154V122H540V86" marker-end="url(#ar)"/>
+          <text class="elbl" id="l-bajar" x="548" y="116">no: bajar H y repetir</text>
+          <path class="edge" id="e-fin" d="M550 190H462" marker-end="url(#ar)"/>
+          <text class="elbl" id="l-fin" x="496" y="182">sí</text>
+
+          <g data-k="1"><rect class="box" x="10" y="30" width="130" height="54" rx="10"/><text class="num" x="20" y="45">1</text><text class="lbl" x="75" y="58" text-anchor="middle">Datos</text><text class="sub" x="75" y="74" text-anchor="middle">materias y reglas</text></g>
+          <g data-k="2"><rect class="box" x="165" y="30" width="130" height="54" rx="10"/><text class="num" x="175" y="45">2</text><text class="lbl" x="230" y="58" text-anchor="middle">Estado inicial</text><text class="sub" x="230" y="74" text-anchor="middle">historial y meta</text></g>
+          <g data-k="3"><rect class="box" x="320" y="30" width="130" height="54" rx="10"/><text class="num" x="330" y="45">3</text><text class="lbl" x="385" y="58" text-anchor="middle">Heurística h</text><text class="sub" x="385" y="74" text-anchor="middle">lo mínimo que falta</text></g>
+          <g data-k="4"><rect class="box" x="475" y="30" width="130" height="54" rx="10"/><text class="num" x="485" y="45">4</text><text class="lbl" x="540" y="58" text-anchor="middle">Generar sucesores</text><text class="sub" x="540" y="74" text-anchor="middle">combinaciones y costo</text></g>
+          <g data-k="5"><rect class="box" x="630" y="30" width="130" height="54" rx="10"/><text class="num" x="640" y="45">5</text><text class="lbl" x="695" y="58" text-anchor="middle">Elegir menor f</text><text class="sub" x="695" y="74" text-anchor="middle">f = g + H · h</text></g>
+          <g data-k="6"><path class="box" d="M835 23L890 57L835 91L780 57Z"/><text class="num" x="830" y="40">6</text><text class="lbl" x="835" y="62" text-anchor="middle">¿Meta?</text></g>
+          <g data-k="7"><rect class="box" x="770" y="163" width="130" height="54" rx="10"/><text class="num" x="780" y="178">7</text><text class="lbl" x="835" y="191" text-anchor="middle">Guardar plan</text><text class="sub" x="835" y="207" text-anchor="middle">mejor costo hasta hoy</text></g>
+          <g data-k="8"><path class="box" d="M610 154L670 190L610 226L550 190Z"/><text class="num" x="604" y="172">8</text><text class="lbl" x="610" y="195" text-anchor="middle">¿H = 1?</text></g>
+          <g data-k="9"><rect class="box" x="330" y="163" width="130" height="54" rx="10"/><text class="num" x="340" y="178">9</text><text class="lbl" x="395" y="191" text-anchor="middle">Plan óptimo</text><text class="sub" x="395" y="207" text-anchor="middle">probado</text></g>
+          <circle id="token" r="8" cx="0" cy="0" transform="translate(75 92)"/>
+        </svg>
+      </div>
+      <div class="explain" aria-live="polite">
+        <div id="f-card" style="display:flex;flex-direction:column;gap:12px">
+          <span class="counter" id="f-count"></span>
+          <h3 id="f-title"></h3>
+          <div id="f-body" style="display:flex;flex-direction:column;gap:12px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bench" aria-labelledby="t-tree" id="sec-tree" tabindex="-1">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span class="eyebrow">Parte 2</span>
+      <h2 id="t-tree">El árbol de búsqueda y su recorrido</h2>
+      <p class="note">Cada caja es un estado: materias aprobadas y periodo en que se inscribe. Cada flecha es un cuatrimestre con lo que se inscribe en él. El árbol crece en el orden exacto en que el algoritmo lo generó.</p>
+    </div>
+    <div class="controls">
+      <div class="tabs" role="tablist" aria-label="Pasada">
+        <button type="button" role="tab" id="tab-p1" aria-selected="true">Pasada 1 · H = 2</button>
+        <button type="button" role="tab" id="tab-p2" aria-selected="false">Pasada 2 · H = 1 con poda</button>
+      </div>
+    </div>
+    <div class="controls">
+      <button type="button" id="t-prev">Anterior</button>
+      <button type="button" id="t-next" class="primary">Siguiente</button>
+      <button type="button" id="t-play">Reproducir</button>
+      <label for="t-range" class="counter" id="t-count"></label>
+      <input type="range" id="t-range" min="0" max="0" value="0">
+    </div>
+    <div class="legend" aria-label="Leyenda">
+      <span><i class="sw" style="border-color:var(--accent);background:var(--panel)"></i>en la frontera</span>
+      <span><i class="sw" style="border-color:var(--warn);background:var(--accent)"></i>se expande ahora</span>
+      <span><i class="sw" style="border-color:var(--accent);background:var(--accent-soft)"></i>ya expandido</span>
+      <span><i class="sw" style="border-color:var(--gray-node);background:var(--soft);border-style:dashed"></i>podado</span>
+      <span><i class="sw" style="border-color:var(--gray-node);background:var(--soft)"></i>repetido</span>
+      <span><i class="sw" style="border-color:var(--ok);background:var(--ok-soft)"></i>meta</span>
+    </div>
+    <div class="viewport" id="vp" tabindex="0" aria-label="Lienzo del árbol: arrastra para moverte, usa la rueda del ratón o los botones para acercar y alejar">
+      <span class="hint">Arrastra para moverte · rueda o pellizco para el zoom · al cambiar de paso la vista vuelve al nodo en curso</span>
+      <div class="zoombar">
+        <button type="button" id="z-in" aria-label="Acercar">+</button>
+        <button type="button" id="z-out" aria-label="Alejar">−</button>
+        <button type="button" id="z-fit" aria-label="Ver todo el árbol">Todo</button>
+        <button type="button" id="z-reset" aria-label="Volver al zoom normal">1:1</button>
+      </div>
+      <span class="zoomlvl" id="z-lvl">100%</span>
+      <svg id="tree" role="img" aria-label="Árbol de búsqueda del ejemplo"></svg>
+    </div>
+    <label class="follow"><input type="checkbox" id="follow" checked> Seguir el nodo de cada paso</label>
+    <div class="row">
+      <div class="card" aria-live="polite" id="tree-explain" style="flex:3 1 420px;min-width:0"></div>
+      <div class="card" style="flex:2 1 280px;min-width:0">
+        <h3 style="font-size:16px;margin-bottom:8px">Frontera ordenada por f</h3>
+        <div id="tree-front"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Ejemplo: materias C Cálculo (6 cr, solo mayo), E Estadística (4 cr, solo septiembre, requiere C), R Redes (6 cr, enero y septiembre), S Seguridad (6 cr, mayo y septiembre, requiere R) e I Inglés (4 cr, todos los periodos). Carga normal 8, carga máxima 10, penalización 0.2 por crédito extra. Las cifras del árbol son las de la ejecución del algoritmo con estos datos.
+  </footer>
+</div>
+
+<script>
+(function(){
+const TRACE={"p1":{"n":[[0,"","Sep",0,3,6,3,null,null,null,null,"frontera"],[1,"","Ene",1.0,3,7.0,4.0,0,"",0,1.0,"frontera"],[2,"I","Ene",1.0,3,7.0,4.0,0,"I",4,1.0,"frontera"],[3,"R","Ene",1.0,2,5.0,3.0,0,"R",6,1.0,"frontera"],[4,"IR","Ene",1.4,2,5.4,3.4,0,"IR",10,1.4,"frontera"],[5,"R","May",2.0,2,6.0,4.0,3,"",0,1.0,"frontera"],[6,"IR","May",2.0,2,6.0,4.0,3,"I",4,1.0,"frontera"],[7,"IR","May",2.4,2,6.4,4.4,4,"",0,1.0,"repetido"],[8,"R","Sep",3.0,2,7.0,5.0,5,"",0,1.0,"frontera"],[9,"CR","Sep",3.0,2,7.0,5.0,5,"C",6,1.0,"frontera"],[10,"IR","Sep",3.0,2,7.0,5.0,5,"I",4,1.0,"frontera"],[11,"RS","Sep",3.0,2,7.0,5.0,5,"S",6,1.0,"frontera"],[12,"CIR","Sep",3.4,1,5.4,4.4,5,"CI",10,1.4,"frontera"],[13,"IRS","Sep",3.4,2,7.4,5.4,5,"IS",10,1.4,"frontera"],[14,"CIR","Ene",4.4,1,6.4,5.4,12,"",0,1.0,"frontera"],[15,"CEIR","Ene",4.4,1,6.4,5.4,12,"E",4,1.0,"frontera"],[16,"CIRS","Ene",4.4,1,6.4,5.4,12,"S",6,1.0,"frontera"],[17,"CEIRS","Ene",4.8,0,4.8,4.8,12,"ES",10,1.4,"frontera"]],"s":[["inicio",0,null,null],["expandir",0,["I","R"],[1,2,3,4]],["expandir",3,["I"],[5,6]],["expandir",4,[],[7]],["expandir",5,["C","I","S"],[8,9,10,11,12,13]],["expandir",12,["E","S"],[14,15,16,17]],["meta",17,null,null]],"cost":4.8,"H":2,"bound":null},"p2":{"n":[[0,"","Sep",0,3,3,3,null,null,null,null,"frontera"],[1,"","Ene",1.0,3,4.0,4.0,0,"",0,1.0,"frontera"],[2,"I","Ene",1.0,3,4.0,4.0,0,"I",4,1.0,"frontera"],[3,"R","Ene",1.0,2,3.0,3.0,0,"R",6,1.0,"frontera"],[4,"IR","Ene",1.4,2,3.4,3.4,0,"IR",10,1.4,"frontera"],[5,"R","May",2.0,2,4.0,4.0,3,"",0,1.0,"frontera"],[6,"IR","May",2.0,2,4.0,4.0,3,"I",4,1.0,"frontera"],[7,"IR","May",2.4,2,4.4,4.4,4,"",0,1.0,"repetido"],[8,"","May",2.0,3,5.0,5.0,1,"",0,1.0,"podado"],[9,"I","May",2.0,3,5.0,5.0,1,"I",4,1.0,"podado"],[10,"R","May",2.0,2,4.0,4.0,1,"R",6,1.0,"repetido"],[11,"IR","May",2.4,2,4.4,4.4,1,"IR",10,1.4,"repetido"],[12,"I","May",2.0,3,5.0,5.0,2,"",0,1.0,"podado"],[13,"IR","May",2.0,2,4.0,4.0,2,"R",6,1.0,"repetido"],[14,"R","Sep",3.0,2,5.0,5.0,5,"",0,1.0,"podado"],[15,"CR","Sep",3.0,2,5.0,5.0,5,"C",6,1.0,"podado"],[16,"IR","Sep",3.0,2,5.0,5.0,5,"I",4,1.0,"podado"],[17,"RS","Sep",3.0,2,5.0,5.0,5,"S",6,1.0,"podado"],[18,"CIR","Sep",3.4,1,4.4,4.4,5,"CI",10,1.4,"frontera"],[19,"IRS","Sep",3.4,2,5.4,5.4,5,"IS",10,1.4,"podado"],[20,"IR","Sep",3.0,2,5.0,5.0,6,"",0,1.0,"podado"],[21,"CIR","Sep",3.0,1,4.0,4.0,6,"C",6,1.0,"frontera"],[22,"IRS","Sep",3.0,2,5.0,5.0,6,"S",6,1.0,"podado"],[23,"CIR","Ene",4.0,1,5.0,5.0,21,"",0,1.0,"podado"],[24,"CEIR","Ene",4.0,1,5.0,5.0,21,"E",4,1.0,"podado"],[25,"CIRS","Ene",4.0,1,5.0,5.0,21,"S",6,1.0,"podado"],[26,"CEIRS","Ene",4.4,0,4.4,4.4,21,"ES",10,1.4,"frontera"]],"s":[["inicio",0,null,null],["expandir",0,["I","R"],[1,2,3,4]],["expandir",3,["I"],[5,6]],["expandir",4,[],[7]],["expandir",1,["I","R"],[8,9,10,11]],["expandir",2,["R"],[12,13]],["expandir",5,["C","I","S"],[14,15,16,17,18,19]],["expandir",6,["C","S"],[20,21,22]],["expandir",21,["E","S"],[23,24,25,26]],["descartar",18,null,null],["meta",26,null,null]],"cost":4.4,"H":1,"bound":4.8}};
+const NAME={C:"Cálculo",E:"Estadística",R:"Redes",S:"Seguridad",I:"Inglés"};
+const fmt=x=>Number(x).toFixed(1);
+const setTxt=s=>s===""?"∅":"{"+s.split("").join(", ")+"}";
+const nodeTxt=s=>s===""?"∅":s;
+const insc=s=>s===""?"nada":s.split("").map(c=>NAME[c]).join(" + ");
+const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function replayAnim(el,cls){el.classList.remove('swap-next','swap-prev');void el.offsetWidth;el.classList.add(cls)}
+
+/* ================= Parte 1: flujo ================= */
+const STEPS=[
+ {k:[1],t:"Datos de entrada",b:`<p>Se carga el plan de estudios reducido: 5 materias que le faltan a la alumna, con créditos, prerrequisitos y periodos en que se abren.</p>
+  <div class="scroll"><table><thead><tr><th>Materia</th><th>Créditos</th><th>Requiere</th><th>Se abre en</th></tr></thead><tbody>
+  <tr><td><b>C</b> Cálculo</td><td>6</td><td>—</td><td>solo mayo</td></tr>
+  <tr><td><b>E</b> Estadística</td><td>4</td><td>C</td><td>solo septiembre</td></tr>
+  <tr><td><b>R</b> Redes</td><td>6</td><td>—</td><td>enero y septiembre</td></tr>
+  <tr><td><b>S</b> Seguridad</td><td>6</td><td>R</td><td>mayo y septiembre</td></tr>
+  <tr><td><b>I</b> Inglés</td><td>4</td><td>—</td><td>todos</td></tr></tbody></table></div>
+  <p class="note">Reglas: carga normal 8 créditos, carga máxima 10, penalización 0.2 por crédito arriba de 8.</p>`},
+ {k:[2],t:"Estado inicial y meta",b:`<p>El estado se describe con dos datos: qué materias están aprobadas (A) y en qué periodo se inscribe (p).</p>
+  <div class="formula">inicio = (A = ∅, p = Sep)&nbsp;&nbsp;&nbsp;meta = A ⊇ {C, E, I, R, S}</div>
+  <p>Como cada materia puede estar aprobada o no y hay 3 periodos, existen 2⁵ × 3 = 96 estados posibles. El trabajo del algoritmo es encontrar el camino más barato del inicio a la meta sin revisarlos todos.</p>`},
+ {k:[3],t:"Heurística: lo mínimo que falta",b:`<p>Antes de moverse, se estima cuántos cuatrimestres faltan como mínimo. Hay dos cotas y se toma la mayor:</p>
+  <div class="formula">créditos: ⌈26 / 10⌉ = 3&nbsp;&nbsp;&nbsp;seriación: C → E y R → S tienen 2 materias</div>
+  <div class="formula">h(inicio) = max(3, 2) = 3</div>
+  <p>Este número nunca exagera: es imposible terminar en menos de 3 cuatrimestres. Por eso el algoritmo puede guiarse con él sin perder el plan óptimo.</p>`},
+ {k:[4],t:"Generar sucesores y su costo",b:`<p>En septiembre solo se pueden inscribir <b>R</b> e <b>I</b>: Cálculo abre en mayo, Estadística necesita Cálculo y Seguridad necesita Redes. Cada combinación de hasta 10 créditos es un sucesor:</p>
+  <div class="formula">costo = 1 + 0.2 · max(0, créditos − 8)</div>
+  <table><thead><tr><th>Inscribir</th><th>Créditos</th><th>Costo</th></tr></thead><tbody>
+  <tr><td>nada</td><td>0</td><td>1.0</td></tr><tr><td>Inglés</td><td>4</td><td>1.0</td></tr><tr><td>Redes</td><td>6</td><td>1.0</td></tr><tr><td>Redes + Inglés</td><td>10</td><td>1.4</td></tr></tbody></table>`},
+ {k:[5],t:"Elegir el más prometedor",b:`<p>La primera pasada usa H = 2: le da el doble de peso a lo que falta para correr hacia la meta. Se calcula f = g + 2 · h para cada sucesor y se toma el menor.</p>
+  <table><thead><tr><th>Sucesor</th><th>g</th><th>h</th><th>f</th></tr></thead><tbody>
+  <tr><td>nada</td><td>1.0</td><td>3</td><td>7.0</td></tr><tr><td>Inglés</td><td>1.0</td><td>3</td><td>7.0</td></tr>
+  <tr class="pick"><td>Redes</td><td>1.0</td><td>2</td><td>5.0</td></tr><tr><td>Redes + Inglés</td><td>1.4</td><td>2</td><td>5.4</td></tr></tbody></table>
+  <p class="note">Con Redes aprobada faltan 20 créditos (2 cuatrimestres) y la cadena más larga es de 2 materias, por eso su h baja a 2.</p>`},
+ {k:[6],t:"¿Ya es la meta? Si no, repetir",e:"no",b:`<p>Los sucesores que no se eligieron se quedan en la <b>frontera</b>, la lista de pendientes. Mientras el estado elegido no sea la meta, se expande, se generan sus sucesores y se vuelve a tomar el de menor f de toda la frontera.</p>
+  <p>Si un sucesor llega a un estado que ya tiene un camino igual o más barato, se marca como <b>repetido</b> y no se vuelve a explorar.</p>
+  <p>En la pasada 1 esto ocurre 5 veces y se generan 18 estados. En la Parte 2 se puede ver cada expansión.</p>`},
+ {k:[7],t:"Primer plan: costo 4.8",e:"si",b:`<p>La pasada 1 llega a la meta con este plan:</p>
+  <div class="plan"><div><div class="per">Sep</div>Redes</div><div><div class="per">Ene</div>nada</div><div class="over"><div class="per">May · 10 cr</div>Cálculo + Inglés · 1.4</div><div class="over"><div class="per">Sep · 10 cr</div>Estadística + Seguridad · 1.4</div></div>
+  <p>Cuesta 1 + 1 + 1.4 + 1.4 = <b>4.8</b>. Es un plan válido y salió rápido, pero como H = 2 solo se garantiza que no cuesta más del doble del óptimo. Se guarda como el mejor hasta ahora.</p>`},
+ {k:[8],t:"Bajar H y repetir con poda",e:"bajar",b:`<p>Como H todavía no es 1, se baja a H = 1 (A* normal) y se busca otra vez desde el inicio, con una regla nueva: se <b>poda</b> todo estado cuyo g + h sea mayor o igual a 4.8, porque ya no puede mejorar el plan guardado.</p>
+  <div class="formula">poda si g + h ≥ 4.8</div>
+  <p>En la pasada 2 se generan 27 estados, pero 13 se podan y 5 resultan repetidos. Solo 8 se expanden.</p>`},
+ {k:[9],t:"Plan óptimo: costo 4.4",e:"fin",b:`<p>La pasada 2 encuentra un plan más barato:</p>
+  <div class="plan"><div><div class="per">Sep</div>Redes</div><div><div class="per">Ene</div>Inglés</div><div><div class="per">May</div>Cálculo</div><div class="over"><div class="per">Sep · 10 cr</div>Estadística + Seguridad · 1.4</div></div>
+  <p>Cuesta 1 + 1 + 1 + 1.4 = <b>4.4</b>. La diferencia: la pasada 1 dejó enero vacío y luego metió Inglés con Cálculo, pagando sobrecarga dos veces. La óptima aprovecha enero para Inglés.</p>
+  <p>Como esta pasada usó H = 1 y terminó, no existe un plan más barato: 4.4 es el óptimo probado.</p>`}
+];
+/* Posición del punto en cada etapa y rutas entre etapas consecutivas (siguen las flechas del diagrama). */
+const POS={1:[75,92],2:[230,92],3:[385,92],4:[540,92],5:[695,92],6:[835,100],7:[835,225],8:[610,232],9:[395,225]};
+const ROUTE={
+ '1-2':[[75,92],[230,92]],'2-3':[[230,92],[385,92]],'3-4':[[385,92],[540,92]],'4-5':[[540,92],[695,92]],
+ '5-6':[[695,92],[760,92],[760,57],[835,57],[835,100]],
+ '6-7':[[835,100],[835,225]],
+ '7-8':[[835,225],[835,190],[670,190],[610,232]],
+ '8-9':[[610,232],[550,190],[460,190],[395,225]]
+};
+const token=document.getElementById('token');
+let tokPos=POS[1].slice(),tokAnim=null;
+function setTok(p){tokPos=p;token.setAttribute('transform',`translate(${p[0]} ${p[1]})`)}
+function animateTok(points){
+  if(tokAnim)cancelAnimationFrame(tokAnim);
+  if(reduced()||points.length<2){setTok(points[points.length-1]);return}
+  const segs=[];let total=0;
+  for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i];const d=Math.hypot(b[0]-a[0],b[1]-a[1]);segs.push([a,b,d]);total+=d}
+  const dur=Math.min(1100,350+total*1.3);const t0=performance.now();
+  const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  (function frame(now){const t=Math.min(1,(now-t0)/dur);let dist=ease(t)*total;
+    for(const [a,b,d] of segs){if(dist<=d||d===0){const r=d?dist/d:1;setTok([a[0]+(b[0]-a[0])*r,a[1]+(b[1]-a[1])*r]);break}dist-=d}
+    if(t<1)tokAnim=requestAnimationFrame(frame);else setTok(points[points.length-1])})(t0);
+}
+let fi=0,prevFi=0;
+const fdots=document.getElementById('f-dots');
+STEPS.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.textContent=i+1;b.setAttribute('aria-label','Paso '+(i+1)+': '+s.t);b.addEventListener('click',()=>goFlow(i));fdots.appendChild(b)});
+function goFlow(i){if(i<0||i>=STEPS.length||i===fi)return;prevFi=fi;fi=i;renderFlow(true)}
+function renderFlow(animate){
+  const s=STEPS[fi];
+  document.getElementById('f-count').textContent='Paso '+(fi+1)+' de '+STEPS.length;
+  document.getElementById('f-title').textContent=s.t;
+  const body=document.getElementById('f-body');body.innerHTML=s.b;
+  if(animate){replayAnim(document.getElementById('f-card'),fi>prevFi?'swap-next':'swap-prev');body.classList.remove('stagger');void body.offsetWidth;body.classList.add('stagger')}
+  document.querySelectorAll('#flow g[data-k]').forEach(g=>{const k=+g.dataset.k;g.classList.toggle('on',s.k.includes(k));g.classList.toggle('done',k<Math.min(...s.k)&&!s.k.includes(k))});
+  const map={no:['e-no','l-no'],si:['e-si','l-si'],bajar:['e-bajar','l-bajar'],fin:['e-fin','l-fin']};
+  Object.values(map).flat().forEach(id=>document.getElementById(id).classList.remove('on'));
+  if(s.e)map[s.e].forEach(id=>document.getElementById(id).classList.add('on'));
+  [...fdots.children].forEach((b,i)=>{if(i===fi)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
+  document.getElementById('f-prev').disabled=fi===0;
+  document.getElementById('f-next').disabled=fi===STEPS.length-1;
+  const a=STEPS[prevFi].k[0],b=s.k[0];
+  if(!animate){setTok(POS[b]);return}
+  if(b===a+1&&ROUTE[a+'-'+b])animateTok(ROUTE[a+'-'+b]);
+  else if(a===b+1&&ROUTE[b+'-'+a])animateTok(ROUTE[b+'-'+a].slice().reverse());
+  else animateTok([tokPos.slice(),POS[b]]);
+}
+document.getElementById('f-prev').addEventListener('click',()=>goFlow(fi-1));
+document.getElementById('f-next').addEventListener('click',()=>goFlow(fi+1));
+document.getElementById('sec-flow').addEventListener('keydown',e=>{if(e.target.matches('input'))return;if(e.key==='ArrowRight'){goFlow(fi+1);e.preventDefault()}if(e.key==='ArrowLeft'){goFlow(fi-1);e.preventDefault()}});
+renderFlow(false);
+
+/* ================= Parte 2: árbol ================= */
+const NS='http://www.w3.org/2000/svg';
+const W=104,Hn=58,GX=10,GY=70;
+const svg=document.getElementById('tree'),vp=document.getElementById('vp');
+let cur='p1',ti=0,prevTi=0,timer=null,L,E={};
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const a in attrs)e.setAttribute(a,attrs[a]);if(parent)parent.appendChild(e);return e}
+const cx=n=>GX+n.x*(W+GX)+W/2, ty=n=>40+n.d*(Hn+GY);
+function layout(P){
+  const nodes=P.n.map(a=>({id:a[0],A:a[1],p:a[2],g:a[3],h:a[4],f:a[5],fa:a[6],parent:a[7],S:a[8],cr:a[9],c:a[10],st0:a[11],kids:[]}));
+  nodes.forEach(n=>{if(n.parent!==null)nodes[n.parent].kids.push(n.id)});
+  let leaf=0;
+  (function place(id,d){const n=nodes[id];n.d=d;if(!n.kids.length){n.x=leaf++;return}n.kids.forEach(k=>place(k,d+1));n.x=(nodes[n.kids[0]].x+nodes[n.kids[n.kids.length-1]].x)/2})(0,0);
+  const maxd=Math.max(...nodes.map(n=>n.d));
+  return {nodes,width:leaf*(W+GX)+GX,height:40+(maxd+1)*(Hn+GY)};
+}
+/* Construye una vez todos los elementos de la pasada; cada paso solo cambia clases, así los colores se animan. */
+function build(){
+  svg.innerHTML='';E={nodes:{},edges:{},labels:{}};
+  const ge=el('g',{},svg),gn=el('g',{},svg);
+  L.nodes.forEach(n=>{
+    if(n.parent!==null){const p=L.nodes[n.parent];const x1=cx(p),y1=ty(p)+Hn,x2=cx(n),y2=ty(n);
+      E.edges[n.id]=el('path',{d:`M${x1} ${y1}C${x1} ${y1+GY/2} ${x2} ${y2-GY/2} ${x2} ${y2}`,class:'e',pathLength:'1',style:'display:none'},ge);
+      const t=el('text',{x:x2,y:y2-8,'text-anchor':'middle',class:'el',style:'display:none'},ge);t.textContent='+'+(n.S===''?'nada':n.S.split('').join('+'))+' · '+fmt(n.c);E.labels[n.id]=t}
+    const g=el('g',{class:'n',transform:`translate(${cx(n)-W/2} ${ty(n)})`,style:'display:none'},gn);
+    const inner=el('g',{class:'inner'},g);
+    el('rect',{class:'b',width:W,height:Hn,rx:9},inner);
+    const t1=el('text',{x:W/2,y:20,'text-anchor':'middle','font-size':13,'font-weight':600},inner);t1.textContent=nodeTxt(n.A)+' · '+n.p;
+    const t2=el('text',{x:W/2,y:37,'text-anchor':'middle','font-size':11},inner);t2.textContent='g '+fmt(n.g)+'  h '+n.h;
+    const t3=el('text',{x:W/2,y:51,'text-anchor':'middle','font-size':11},inner);
+    E.nodes[n.id]={g,t3};
+  });
+  E.cursor=el('rect',{id:'cursor',width:W+14,height:Hn+14,rx:13,x:0,y:0},svg);
+}
+function stateAt(P,k){
+  const vis=new Set(),st={};let current=null,goal=null;
+  for(let i=0;i<=k;i++){const [kind,node,,kids]=P.s[i];
+    if(kind==='inicio'){vis.add(node);st[node]='frontera'}
+    if(kind==='expandir'){if(current!==null&&st[current]==='actual')st[current]='expandido';st[node]='actual';current=node;kids.forEach(c=>{vis.add(c);st[c]=L.nodes[c].st0})}
+    if(kind==='descartar'){if(current!==null&&st[current]==='actual')st[current]='expandido';current=null;st[node]='repetido'}
+    if(kind==='meta'){if(current!==null&&st[current]==='actual')st[current]='expandido';current=null;st[node]='meta';goal=node}
+  }
+  return {vis,st,goal};
+}
+function pathSet(goal){const s=new Set();let x=goal;while(x!==null&&x!==undefined){s.add(x);x=L.nodes[x].parent}return s}
+let shown=new Set(),prevFront=new Set();
+function renderTree(animate){
+  const P=TRACE[cur];const H=P.H;
+  const {vis,st,goal}=stateAt(P,ti);const ps=goal!==null?pathSet(goal):new Set();
+  const forward=ti>prevTi;
+  L.nodes.forEach(n=>{
+    const ne=E.nodes[n.id];const isV=vis.has(n.id);
+    if(isV){
+      const fresh=!shown.has(n.id);ne.g.style.display='';
+      const s=st[n.id]||'frontera';ne.g.setAttribute('class','n st-'+s+(fresh&&animate&&forward?' appear':''));
+      ne.t3.textContent=s==='podado'?'podado g+h '+fmt(n.fa):s==='repetido'?'repetido':s==='meta'?'META · '+fmt(n.g):'f '+fmt(n.f);
+      ne.t3.setAttribute('class',(s==='podado'||s==='repetido'||s==='meta')?'tag':'');
+      if(n.parent!==null){const e=E.edges[n.id],lb=E.labels[n.id];e.style.display='';lb.style.display='';
+        const onP=ps.has(n.id)&&ps.has(n.parent);
+        e.setAttribute('class','e'+(onP?' path':'')+(fresh&&animate&&forward?' appear':''));
+        lb.setAttribute('class','el'+(onP?' path':'')+(fresh&&animate&&forward?' appear':''));}
+    }else{ne.g.style.display='none';if(n.parent!==null){E.edges[n.id].style.display='none';E.labels[n.id].style.display='none'}}
+  });
+  shown=vis;
+  // anillo que se desplaza al nodo de este paso
+  const [kind,node,eleg,kids]=P.s[ti];const fn=L.nodes[node];
+  E.cursor.style.transform=`translate(${cx(fn)-W/2-7}px,${ty(fn)-7}px)`;
+  E.cursor.setAttribute('class',kind==='meta'?'meta':kind==='descartar'?'descartar':'');
+  if(!animate){E.cursor.style.transition='none';void E.cursor.getBoundingClientRect();E.cursor.style.transition=''}
+  if(document.getElementById('follow').checked)focusOn(fn,animate);
+  // explicación
+  let html='';
+  const fexp=m=>H===1?`f = ${fmt(m.g)} + ${m.h} = ${fmt(m.f)}`:`f = ${fmt(m.g)} + ${H}·${m.h} = ${fmt(m.f)}`;
+  if(kind==='inicio'){
+    html=`<h3 style="font-size:16px">Se crea la raíz</h3><p>El estado inicial ${setTxt(fn.A)} · ${fn.p} entra a la frontera con g = 0 y h = ${fn.h}, así que ${fexp(fn)}.</p>`+(P.bound?`<p class="note">Esta pasada conoce el plan de 4.8 de la pasada 1 y podará todo estado con g + h ≥ 4.8.</p>`:`<p class="note">Con H = ${H}, la búsqueda prefiere estados con poco por recorrer aunque cuesten un poco más.</p>`);
+  }else if(kind==='expandir'){
+    const ks=kids.map(c=>L.nodes[c]);
+    const front=ks.filter(c=>c.st0==='frontera').length,pod=ks.filter(c=>c.st0==='podado').length,rep=ks.filter(c=>c.st0==='repetido').length;
+    html=`<h3 style="font-size:16px">Se expande ${setTxt(fn.A)} · ${fn.p}</h3><p>Es el de menor f en la frontera (${fexp(fn)}). En ${fn.p.toLowerCase()} se pueden inscribir: ${eleg.length?eleg.map(c=>NAME[c]).join(', '):'ninguna materia (solo queda esperar al siguiente periodo)'}.</p>
+      <p>Genera ${ks.length} sucesor${ks.length===1?'':'es'}: ${front} a la frontera${pod?`, ${pod} podado${pod===1?'':'s'}`:''}${rep?`, ${rep} repetido${rep===1?'':'s'}`:''}.</p>
+      <ul style="margin:0;padding-left:18px;font-size:14px">${ks.map(c=>`<li>${insc(c.S)} (${c.cr} cr, costo ${fmt(c.c)}) → ${c.st0==='podado'?`podado: g + h = ${fmt(c.fa)} ≥ ${fmt(P.bound)}`:c.st0==='repetido'?'repetido: ese estado ya tiene un camino igual o más barato':fexp(c)}</li>`).join('')}</ul>`;
+  }else if(kind==='descartar'){
+    html=`<h3 style="font-size:16px">Se descarta ${setTxt(fn.A)} · ${fn.p}</h3><p>Salió de la frontera, pero ese mismo estado ya se alcanzó con g = 3.0, más barato que su g = ${fmt(fn.g)}. No se vuelve a expandir.</p>`;
+  }else{
+    const pth=[...pathSet(node)].reverse().map(i=>L.nodes[i]).filter(x=>x.parent!==null);
+    html=`<h3 style="font-size:16px">Meta alcanzada: costo ${fmt(fn.g)}</h3><p>${pth.map(x=>`${L.nodes[x.parent].p}: ${insc(x.S)}`).join(' · ')}.</p>`+(cur==='p1'?`<p class="note">Con H = 2 se garantiza que no cuesta más del doble del óptimo. La pasada 2 busca algo mejor.</p>`:`<p class="note">H = 1 y la búsqueda terminó: 4.4 es el óptimo probado. Mejora en 0.4 al plan de la pasada 1.</p>`);
+  }
+  const ex=document.getElementById('tree-explain');ex.innerHTML='<div class="exin" style="display:flex;flex-direction:column;gap:8px">'+html+'</div>';
+  if(animate){const inner=ex.firstChild;inner.classList.add(forward?'swap-next':'swap-prev');const ul=inner.querySelector('ul');if(ul)ul.classList.add('stagger')}
+  const fr=[...vis].filter(id=>st[id]==='frontera').map(id=>L.nodes[id]).sort((a,b)=>a.f-b.f||a.id-b.id);
+  document.getElementById('tree-front').innerHTML=fr.length?`<table><thead><tr><th>Estado</th><th>g</th><th>h</th><th>f</th></tr></thead><tbody>${fr.map((x,i)=>`<tr class="${i===0&&kind!=='meta'?'pick':''}${animate&&forward&&!prevFront.has(x.id)?' fr-row-new':''}"><td class="mono">${setTxt(x.A)} · ${x.p}</td><td>${fmt(x.g)}</td><td>${x.h}</td><td>${fmt(x.f)}</td></tr>`).join('')}</tbody></table><p class="note" style="margin-top:6px">${kind==='meta'?'La búsqueda se detuvo al sacar la meta de la frontera.':'El primero de la lista es el que se expande en el siguiente paso. En naranja, los que acaban de entrar.'}</p>`:'<p class="note">Vacía.</p>';
+  prevFront=new Set(fr.map(x=>x.id));
+  document.getElementById('t-count').textContent='Paso '+(ti+1)+' de '+P.s.length;
+  const rg=document.getElementById('t-range');rg.max=P.s.length-1;rg.value=ti;
+  document.getElementById('t-prev').disabled=ti===0;document.getElementById('t-next').disabled=ti===P.s.length-1;
+  prevTi=ti;
+}
+
+/* ---------- Lienzo: arrastre, rueda y pellizco ---------- */
+const view={x:0,y:0,s:1};let vAnim=null;
+const MIN_S=.25,MAX_S=3;
+function vpSize(){return [vp.clientWidth,vp.clientHeight]}
+function applyView(){const [w,h]=vpSize();svg.setAttribute('viewBox',`${view.x} ${view.y} ${w/view.s} ${h/view.s}`);document.getElementById('z-lvl').textContent=Math.round(view.s*100)+'%'}
+function tweenView(to,animate){
+  if(vAnim)cancelAnimationFrame(vAnim);
+  if(!animate||reduced()){Object.assign(view,to);applyView();return}
+  const from={...view},t0=performance.now(),dur=550;const ease=t=>1-Math.pow(1-t,3);
+  (function frame(now){const t=Math.min(1,(now-t0)/dur),k=ease(t);
+    view.x=from.x+(to.x-from.x)*k;view.y=from.y+(to.y-from.y)*k;view.s=from.s+(to.s-from.s)*k;applyView();
+    if(t<1)vAnim=requestAnimationFrame(frame)})(t0);
+}
+function focusOn(n,animate){const [w,h]=vpSize();const s=view.s;
+  tweenView({s,x:cx(n)-w/(2*s),y:ty(n)+Hn/2-h/(2.6*s)},animate)}
+function fitAll(animate){const [w,h]=vpSize();const s=Math.max(MIN_S,Math.min(MAX_S,Math.min(w/(L.width+20),h/(L.height+30))));
+  tweenView({s,x:L.width/2-w/(2*s),y:L.height/2-h/(2*s)},animate)}
+function zoomAt(px,py,factor,animate){const s2=Math.max(MIN_S,Math.min(MAX_S,view.s*factor));const wx=view.x+px/view.s,wy=view.y+py/view.s;
+  tweenView({s:s2,x:wx-px/s2,y:wy-py/s2},animate)}
+/* Mover o hacer zoom a mano no desactiva el seguimiento: en el siguiente paso la vista vuelve al nodo en curso, conservando el zoom elegido. */
+function stopFollow(){}
+vp.addEventListener('wheel',e=>{e.preventDefault();if(vAnim)cancelAnimationFrame(vAnim);const r=vp.getBoundingClientRect();
+  const f=Math.exp(-e.deltaY*(e.ctrlKey?0.01:0.0018));zoomAt(e.clientX-r.left,e.clientY-r.top,f,false);stopFollow()},{passive:false});
+const ptrs=new Map();let pinch=null;
+vp.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;vp.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});vp.classList.add('dragging');if(vAnim)cancelAnimationFrame(vAnim);
+  if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y)}}});
+vp.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;const prev=ptrs.get(e.pointerId);const now={x:e.clientX,y:e.clientY};ptrs.set(e.pointerId,now);
+  if(ptrs.size===1){view.x-=(now.x-prev.x)/view.s;view.y-=(now.y-prev.y)/view.s;applyView();stopFollow()}
+  else if(ptrs.size===2&&pinch){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);const r=vp.getBoundingClientRect();
+    zoomAt((a.x+b.x)/2-r.left,(a.y+b.y)/2-r.top,d/pinch.d,false);pinch.d=d;stopFollow()}});
+function endPtr(e){ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(!ptrs.size)vp.classList.remove('dragging')}
+vp.addEventListener('pointerup',endPtr);vp.addEventListener('pointercancel',endPtr);
+vp.addEventListener('keydown',e=>{const st=60/view.s;const m={ArrowUp:[0,-st],ArrowDown:[0,st]};
+  if(e.key==='+'||e.key==='='){zoomAt(vp.clientWidth/2,vp.clientHeight/2,1.25,true);stopFollow();e.preventDefault()}
+  else if(e.key==='-'){zoomAt(vp.clientWidth/2,vp.clientHeight/2,.8,true);stopFollow();e.preventDefault()}
+  else if(m[e.key]){view.x+=m[e.key][0];view.y+=m[e.key][1];applyView();stopFollow();e.preventDefault();e.stopPropagation()}});
+document.getElementById('z-in').addEventListener('click',()=>{zoomAt(vp.clientWidth/2,vp.clientHeight/2,1.25,true);stopFollow()});
+document.getElementById('z-out').addEventListener('click',()=>{zoomAt(vp.clientWidth/2,vp.clientHeight/2,.8,true);stopFollow()});
+document.getElementById('z-fit').addEventListener('click',()=>{stopFollow();fitAll(true)});
+document.getElementById('z-reset').addEventListener('click',()=>{const n=L.nodes[TRACE[cur].s[ti][1]];view.s=1;focusOn(n,true)});
+document.getElementById('follow').addEventListener('change',e=>{if(e.target.checked)focusOn(L.nodes[TRACE[cur].s[ti][1]],true)});
+window.addEventListener('resize',applyView);
+
+/* ---------- Controles de pasos ---------- */
+function goTree(i,animate=true){const P=TRACE[cur];if(i<0||i>=P.s.length)return;ti=i;renderTree(animate)}
+function setPass(p){stop();cur=p;ti=0;prevTi=0;L=layout(TRACE[cur]);shown=new Set();prevFront=new Set();build();
+  document.getElementById('tab-p1').setAttribute('aria-selected',p==='p1');document.getElementById('tab-p2').setAttribute('aria-selected',p==='p2');
+  view.s=1;renderTree(false);if(!document.getElementById('follow').checked)focusOn(L.nodes[0],false)}
+function stop(){if(timer){clearInterval(timer);timer=null;document.getElementById('t-play').textContent='Reproducir'}}
+document.getElementById('tab-p1').addEventListener('click',()=>setPass('p1'));
+document.getElementById('tab-p2').addEventListener('click',()=>setPass('p2'));
+document.getElementById('t-prev').addEventListener('click',()=>{stop();goTree(ti-1)});
+document.getElementById('t-next').addEventListener('click',()=>{stop();goTree(ti+1)});
+document.getElementById('t-range').addEventListener('input',e=>{stop();goTree(+e.target.value)});
+document.getElementById('t-play').addEventListener('click',e=>{
+  if(timer){stop();return}
+  if(ti>=TRACE[cur].s.length-1){setPass(cur)}
+  e.target.textContent='Pausar';
+  timer=setInterval(()=>{if(ti<TRACE[cur].s.length-1)goTree(ti+1);else stop()},1800);
+});
+document.getElementById('sec-tree').addEventListener('keydown',e=>{if(e.target.matches('input')||e.target===vp&&(e.key==='ArrowUp'||e.key==='ArrowDown'))return;if(e.key==='ArrowRight'){stop();goTree(ti+1);e.preventDefault()}if(e.key==='ArrowLeft'){stop();goTree(ti-1);e.preventDefault()}});
+setPass('p1');
+})();
+</script>

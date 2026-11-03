@@ -1,0 +1,533 @@
+<title>Anytime A* paso a paso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: lección en cinco bloques; cada bloque combina un objeto interactivo (deslizador, mapa, gráfica) con su explicación al lado. */
+:root{
+  --bg:#F3F4F6; --panel:#FFFFFF; --ink:#16191F; --muted:#4D5562; --line:#D5DAE1; --soft:#E9EDF3;
+  --accent:#1F4FD1; --accent-soft:#E3EAFB; --accent-ink:#FFFFFF;
+  --warn:#A64A0A; --warn-soft:#FBEBDD;
+  --ok:#2C6B34; --ok-soft:#E2F1E3;
+  --wall:#2B3038; --mud:#D9C6A3; --mud-line:#B79C6E; --free:#FFFFFF;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --ease:cubic-bezier(.22,.8,.26,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12151B; --panel:#1B1F27; --ink:#E8EBF0; --muted:#A8B0BC; --line:#343A46; --soft:#252A34;
+  --accent:#7EA2FF; --accent-soft:#233257; --accent-ink:#0E1424;
+  --warn:#F2A465; --warn-soft:#3A2717;
+  --ok:#7FCB88; --ok-soft:#1D3321;
+  --wall:#8C95A5; --mud:#5B4A30; --mud-line:#7D6744; --free:#1B1F27; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151B; --panel:#1B1F27; --ink:#E8EBF0; --muted:#A8B0BC; --line:#343A46; --soft:#252A34;
+  --accent:#7EA2FF; --accent-soft:#233257; --accent-ink:#0E1424;
+  --warn:#F2A465; --warn-soft:#3A2717;
+  --ok:#7FCB88; --ok-soft:#1D3321;
+  --wall:#8C95A5; --mud:#5B4A30; --mud-line:#7D6744; --free:#1B1F27; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,4.2vw,46px);letter-spacing:-0.01em}
+h2{font-size:28px}
+h3{font-size:19px}
+p{margin:0}
+.lede{color:var(--muted);max-width:68ch;font-size:17px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.mono{font-family:var(--f-mono)}
+.bench{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:18px}
+.row{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start}
+.main{flex:3 1 520px;min-width:0}
+.side{flex:2 1 300px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-size:15px;min-height:44px;padding:8px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+button[aria-pressed="true"],button[aria-selected="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button[disabled]{opacity:.45;cursor:default}
+label.inline{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);min-height:44px}
+input[type=range]{accent-color:var(--accent);min-height:44px}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+.card{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel)}
+.soft{background:var(--soft);border-radius:10px;padding:14px}
+.note{color:var(--muted);font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500}
+tr.on td{background:var(--accent-soft);font-weight:600}
+.formula{font-family:var(--f-mono);font-size:16px;background:var(--soft);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{background:var(--soft);border-radius:8px;padding:10px}
+.stat .k{font-size:12px;color:var(--muted)}
+.stat .v{font-family:var(--f-mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .v.bump{animation:bump .4s var(--ease)}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.terms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.terms>div{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.terms b{font-family:var(--f-mono);font-size:15px}
+@media (max-width:720px){.terms{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:440px){.terms{grid-template-columns:1fr}}
+
+/* Deslizador de H */
+.cand{display:flex;flex-direction:column;gap:6px}
+.cand .name{display:flex;justify-content:space-between;font-size:14px}
+.bar{display:flex;height:30px;border-radius:6px;overflow:hidden;background:var(--soft)}
+.bar .g{background:var(--muted);transition:width .35s var(--ease)}
+.bar .h{background:var(--accent);transition:width .35s var(--ease)}
+.cand.win .name b{color:var(--warn)}
+.cand.win .bar{outline:3px solid var(--warn);outline-offset:2px}
+.regime{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;font-size:13px}
+.regime div{padding:8px;border-radius:8px;border:1px solid var(--line);transition:background .3s,border-color .3s}
+.regime div.on{background:var(--accent-soft);border-color:var(--accent)}
+
+/* Pseudocódigo */
+.code{font-family:var(--f-mono);font-size:13px;line-height:1.6;background:var(--soft);border-radius:10px;padding:10px 0;overflow-x:auto}
+.code div{padding:1px 12px;white-space:pre;border-left:3px solid transparent;transition:background .15s,border-color .15s}
+.code div.hl{background:var(--warn-soft);border-left-color:var(--warn)}
+.code div.dim{opacity:.55}
+.code .ln{color:var(--muted);display:inline-block;width:2ch}
+
+/* Mapa */
+.mapbox{border:1px solid var(--line);border-radius:12px;overflow:auto;background:var(--bg)}
+.map{display:block;width:100%;min-width:560px;height:auto}
+.map .t-free{fill:var(--free)}
+.map .t-wall{fill:var(--wall)}
+.map .t-mud{fill:url(#mud)}
+.map .grid{fill:none;stroke:var(--line);stroke-width:1}
+.map .ov{fill:transparent;stroke:transparent;transition:fill .3s,stroke .3s}
+.map .ov.open{stroke:var(--accent);stroke-width:2.5;fill:transparent}
+.map .ov.closed{fill:var(--accent);fill-opacity:.22}
+.map .ov.recent{fill:var(--accent);fill-opacity:.45}
+.map .ov.cur{fill:var(--warn);fill-opacity:.55;stroke:var(--warn);stroke-width:3}
+.map .ov.pruned{fill:var(--muted);fill-opacity:.18}
+.map .ov.pop{animation:cellpop .35s var(--ease)}
+@keyframes cellpop{from{transform:scale(.3)}to{transform:scale(1)}}
+.map .ov{transform-box:fill-box;transform-origin:center}
+.map .x{stroke:var(--muted);stroke-width:2;opacity:.8}
+.map .val{font-family:var(--f-mono);font-size:10px;fill:var(--ink);pointer-events:none}
+.map .path{fill:none;stroke:var(--ok);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.map .path.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1s var(--ease) forwards}
+.map .oldpath{fill:none;stroke:var(--warn);stroke-width:3;stroke-dasharray:6 6;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+@keyframes draw{to{stroke-dashoffset:0}}
+.map .mark{font-family:var(--f-display);font-size:18px;font-weight:700;fill:var(--accent-ink)}
+.map .markbg{fill:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:16px;height:16px;border-radius:3px;display:inline-block;border:2px solid transparent}
+.explain-in{animation:inR .4s var(--ease) both}
+@keyframes inR{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+
+/* Gráfica de mejora */
+.chart text{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
+.chart .axis{stroke:var(--line)}
+.chart .gridl{stroke:var(--line);stroke-dasharray:3 4}
+.chart .best{fill:none;stroke:var(--ok);stroke-width:3}
+.chart .lb{fill:none;stroke:var(--warn);stroke-width:2;stroke-dasharray:6 5}
+.chart .band{fill:var(--ok);fill-opacity:.12}
+.chart .dot{fill:var(--ok);stroke:var(--panel);stroke-width:2;transition:r .3s}
+.chart .dot.on{r:8}
+.chart .lbl{fill:var(--ink);font-weight:600}
+.mapping td:first-child{font-weight:600}
+footer{color:var(--muted);font-size:14px;max-width:75ch}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="mud" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="8" height="8" style="fill:var(--mud)"/><line x1="0" y1="0" x2="0" y2="8" style="stroke:var(--mud-line);stroke-width:3"/>
+    </pattern>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <span class="eyebrow">Método de búsqueda del proyecto RutaCuatri</span>
+    <h1>Anytime A* paso a paso</h1>
+    <p class="lede">Anytime A* responde rápido con un plan aceptable y lo sigue mejorando hasta probar que es el mejor posible. Esta página lo construye desde cero: primero las piezas, luego cómo crece una búsqueda A* celda por celda, y al final cómo se encadenan las pasadas.</p>
+  </header>
+
+  <!-- 1. Piezas -->
+  <section class="bench" aria-labelledby="t1">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span class="eyebrow">1 · Las piezas</span>
+      <h2 id="t1">Seis palabras para entender todo lo demás</h2>
+    </div>
+    <div class="terms">
+      <div><b>Estado</b><span class="note">Una situación del problema. En el mapa, una celda; en RutaCuatri, las materias aprobadas y el periodo.</span></div>
+      <div><b>g(n)</b><span class="note">Lo que ya costó llegar desde el inicio hasta el estado n. Es un dato exacto.</span></div>
+      <div><b>h(n)</b><span class="note">Una estimación de lo que falta para la meta. Nunca exagera: es una cota por debajo.</span></div>
+      <div><b>f(n) = g + H · h</b><span class="note">La calificación de cada estado. Siempre se expande el de f más baja.</span></div>
+      <div><b>Frontera</b><span class="note">Los estados descubiertos que todavía no se exploran. Es la lista de pendientes.</span></div>
+      <div><b>Cerrados</b><span class="note">Los estados ya explorados. No se vuelven a abrir si se llega a ellos por un camino igual o peor.</span></div>
+    </div>
+
+    <div class="row">
+      <div class="main" style="display:flex;flex-direction:column;gap:14px">
+        <h3>¿Qué hace el peso H? Muévelo y mira a quién se expande</h3>
+        <p class="note">Dos estados esperan en la frontera. A lleva poco recorrido pero le falta mucho; B ya recorrió más pero está cerca de la meta.</p>
+        <label class="inline" style="color:var(--ink);font-size:16px" for="hslider">H = <b class="mono" id="hval">1.00</b></label>
+        <input type="range" id="hslider" min="0" max="4" step="0.05" value="1" style="width:100%">
+        <div class="cand" id="candA">
+          <div class="name"><b>A · g = 6, h = 8</b><span class="mono" id="fA"></span></div>
+          <div class="bar"><div class="g" id="gA"></div><div class="h" id="hA"></div></div>
+        </div>
+        <div class="cand" id="candB">
+          <div class="name"><b>B · g = 10, h = 5</b><span class="mono" id="fB"></span></div>
+          <div class="bar"><div class="g" id="gB"></div><div class="h" id="hB"></div></div>
+        </div>
+        <div class="legend"><span><i class="sw" style="background:var(--muted)"></i>g: ya recorrido</span><span><i class="sw" style="background:var(--accent)"></i>H · h: lo que falta, con peso</span></div>
+      </div>
+      <div class="side">
+        <div class="card" aria-live="polite" id="hexplain"></div>
+        <div class="regime" id="regime">
+          <div data-r="0"><b>H = 0</b><br>Solo cuenta lo recorrido: Costo Uniforme.</div>
+          <div data-r="1"><b>H = 1</b><br>Balance exacto: A*, da el óptimo.</div>
+          <div data-r="2"><b>H &gt; 1</b><br>Corre hacia la meta: Weighted A*, más rápido.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. A* paso a paso -->
+  <section class="bench" aria-labelledby="t2" id="sec2">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span class="eyebrow">2 · Cómo crece una búsqueda</span>
+      <h2 id="t2">Una pasada de A*, celda por celda</h2>
+      <p class="note">Ir de S a G. Moverse a una celda normal cuesta 1 y a una de lodo cuesta 3; los muros no se cruzan. La heurística es la distancia en cuadras hasta G, que nunca exagera porque cada paso cuesta al menos 1.</p>
+    </div>
+    <div class="controls">
+      <span class="note">Peso H:</span>
+      <div class="controls" role="group" aria-label="Peso H" id="hbtns"></div>
+      <label class="inline"><input type="checkbox" id="showf"> Mostrar f en la frontera</label>
+    </div>
+    <div class="controls">
+      <button type="button" id="s-reset">Reiniciar</button>
+      <button type="button" id="s-step" class="primary">Siguiente paso</button>
+      <button type="button" id="s-play">Reproducir</button>
+      <button type="button" id="s-end">Ir al final</button>
+      <label class="inline" for="s-speed">Velocidad</label>
+      <input type="range" id="s-speed" min="1" max="10" value="5" style="width:140px">
+    </div>
+    <div class="row">
+      <div class="main" style="display:flex;flex-direction:column;gap:10px">
+        <div class="mapbox"><svg class="map" id="map1" role="img" aria-label="Mapa en cuadrícula con la búsqueda en curso"></svg></div>
+        <div class="legend">
+          <span><i class="sw" style="border-color:var(--accent)"></i>frontera</span>
+          <span><i class="sw" style="background:var(--accent);opacity:.45"></i>recién explorada</span>
+          <span><i class="sw" style="background:var(--accent);opacity:.22"></i>explorada</span>
+          <span><i class="sw" style="background:var(--warn);opacity:.7"></i>se explora ahora</span>
+          <span><i class="sw" style="background:url(#mud);background:var(--mud)"></i>lodo (costo 3)</span>
+          <span><i class="sw" style="background:var(--wall)"></i>muro</span>
+          <span><i class="sw" style="background:var(--ok)"></i>camino final</span>
+        </div>
+      </div>
+      <div class="side">
+        <div class="stats">
+          <div class="stat"><div class="k">Paso</div><div class="v" id="st-step">0</div></div>
+          <div class="stat"><div class="k">Explorados</div><div class="v" id="st-exp">0</div></div>
+          <div class="stat"><div class="k">En la frontera</div><div class="v" id="st-open">1</div></div>
+          <div class="stat"><div class="k">Costo del camino</div><div class="v" id="st-cost">—</div></div>
+        </div>
+        <div class="code" id="code1" aria-label="Pseudocódigo de A*"></div>
+        <div class="card" aria-live="polite" id="ex1"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Anytime -->
+  <section class="bench" aria-labelledby="t3" id="sec3">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span class="eyebrow">3 · Lo que agrega Anytime</span>
+      <h2 id="t3">Cuatro pasadas: rápido primero, óptimo al final</h2>
+      <p class="note">Anytime A* repite la búsqueda con H = 3, 2, 1.5 y 1. Cada pasada recuerda el mejor costo encontrado y poda todo estado con g + h mayor o igual a ese costo, porque ya no puede mejorarlo. Las celdas grises con una × son las podadas.</p>
+    </div>
+    <div class="controls">
+      <div class="controls" role="tablist" aria-label="Pasada" id="pbtns"></div>
+      <button type="button" id="p-play" class="primary">Reproducir pasada</button>
+      <button type="button" id="p-all">Reproducir las 4</button>
+    </div>
+    <div class="row">
+      <div class="main" style="display:flex;flex-direction:column;gap:10px">
+        <div class="mapbox"><svg class="map" id="map2" role="img" aria-label="Mapa con la pasada seleccionada de Anytime A*"></svg></div>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--ok)"></i>plan de esta pasada</span>
+          <span><i class="sw" style="border:2px dashed var(--warn)"></i>mejor plan anterior</span>
+          <span><i class="sw" style="background:var(--muted);opacity:.3"></i>podada</span>
+        </div>
+      </div>
+      <div class="side">
+        <div class="card" aria-live="polite" id="ex2"></div>
+        <div class="card">
+          <h3 style="font-size:16px;margin-bottom:6px">El óptimo queda encerrado</h3>
+          <svg class="chart" id="chart" viewBox="0 0 360 220" style="width:100%;height:auto" role="img" aria-label="Gráfica del mejor costo y la cota inferior por pasada"></svg>
+          <p class="note">Verde: mejor plan encontrado. Naranja: cota inferior del óptimo, el mayor entre h(S) y costo ÷ H. El óptimo siempre está en la franja entre ambas; en la pasada 4 se juntan.</p>
+        </div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table id="ptable"><thead><tr><th>Pasada</th><th>H</th><th>Estados explorados</th><th>Podas</th><th>Costo encontrado</th><th>Garantía</th><th>El óptimo está entre</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <!-- 4. Del mapa a RutaCuatri -->
+  <section class="bench" aria-labelledby="t4">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span class="eyebrow">4 · De vuelta al proyecto</span>
+      <h2 id="t4">Lo mismo, pero con materias en vez de celdas</h2>
+      <p class="note">El mapa sirve para ver crecer la búsqueda. En RutaCuatri el algoritmo es idéntico; solo cambia qué es un estado y cuánto cuesta moverse.</p>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="mapping">
+        <thead><tr><th>Pieza</th><th>En el mapa</th><th>En RutaCuatri</th></tr></thead>
+        <tbody>
+          <tr><td>Estado</td><td>Una celda (x, y)</td><td>Materias aprobadas y periodo del año</td></tr>
+          <tr><td>Inicio</td><td>S</td><td>El historial del estudiante y su siguiente periodo</td></tr>
+          <tr><td>Meta</td><td>G</td><td>Todas las materias pedidas aprobadas</td></tr>
+          <tr><td>Movimiento</td><td>Ir a una celda vecina</td><td>Inscribir un conjunto de materias en un cuatrimestre</td></tr>
+          <tr><td>Costo</td><td>1 en celda normal, 3 en lodo</td><td>1 por cuatrimestre, más 0.1 por cada crédito arriba de la carga normal</td></tr>
+          <tr><td>Heurística h</td><td>Distancia en cuadras hasta G</td><td>El mayor entre créditos que faltan ÷ carga máxima y la cadena de seriación más larga</td></tr>
+          <tr><td>Por qué nunca exagera</td><td>Cada paso cuesta al menos 1 y acerca a lo sumo 1</td><td>Cada cuatrimestre cuesta al menos 1, aprueba a lo sumo la carga máxima y avanza la cadena a lo sumo 1</td></tr>
+          <tr><td>Lodo</td><td>Atajo corto pero caro</td><td>Meter muchas materias juntas: termina antes pero paga sobrecarga</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 5. Propiedades -->
+  <section class="bench" aria-labelledby="t5">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span class="eyebrow">5 · Garantías</span>
+      <h2 id="t5">Qué promete el método y qué cuesta</h2>
+    </div>
+    <div class="terms">
+      <div><b>Siempre responde</b><span class="note">Si existe un camino, la primera pasada lo encuentra. Si no existe, agota los estados y lo dice.</span></div>
+      <div><b>Calidad garantizada</b><span class="note">Con h que nunca exagera, la pasada con peso H da un costo de a lo sumo H veces el óptimo.</span></div>
+      <div><b>Óptimo al final</b><span class="note">La última pasada usa H = 1, que es A*. Si termina, el plan es el mejor posible.</span></div>
+      <div><b>Se puede detener</b><span class="note">En cualquier momento se tiene el mejor plan hasta ahora y un intervalo donde está el óptimo.</span></div>
+      <div><b>Paga en trabajo total</b><span class="note" id="cost-note"></span></div>
+      <div><b>Por eso en RutaCuatri</b><span class="note">Con mallas grandes A* tarda minutos en dar su único plan; Anytime da uno en segundos y lo mejora mientras el estudiante lo revisa.</span></div>
+    </div>
+  </section>
+
+  <footer>Todas las cifras de esta página las calcula la propia página al ejecutar el algoritmo sobre el mapa mostrado.</footer>
+</div>
+
+<script>
+(function(){
+const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* ---------- 1. Deslizador de H ---------- */
+const A={g:6,h:8},B={g:10,h:5};
+function renderH(){
+  const H=+document.getElementById('hslider').value;document.getElementById('hval').textContent=H.toFixed(2);
+  const fA=A.g+H*A.h,fB=B.g+H*B.h,max=Math.max(B.g+4*B.h,A.g+4*A.h);
+  const set=(id,v)=>document.getElementById(id).style.width=(v/max*100)+'%';
+  set('gA',A.g);set('hA',H*A.h);set('gB',B.g);set('hB',H*B.h);
+  document.getElementById('fA').textContent=`f = 6 + ${H.toFixed(2)}·8 = ${fA.toFixed(2)}`;
+  document.getElementById('fB').textContent=`f = 10 + ${H.toFixed(2)}·5 = ${fB.toFixed(2)}`;
+  const win=Math.abs(fA-fB)<1e-9?null:(fA<fB?'A':'B');
+  document.getElementById('candA').classList.toggle('win',win==='A');document.getElementById('candB').classList.toggle('win',win==='B');
+  let t;
+  if(win===null)t=`Empate en f = ${fA.toFixed(2)}. Este es el punto de cambio: H = 4/3.`;
+  else if(win==='A')t=`<b>Se expande A.</b> Con H = ${H.toFixed(2)}, lo ya recorrido pesa más: A gastó 6 contra 10 de B. La búsqueda es cautelosa y revisa estados baratos aunque estén lejos.`;
+  else t=`<b>Se expande B.</b> Con H = ${H.toFixed(2)}, lo que falta pesa más: a B le faltan 5 contra 8 de A. La búsqueda corre hacia la meta aunque B haya costado más.`;
+  t+=`<p class="note" style="margin-top:6px">El cambio ocurre en H = (10 − 6) ÷ (8 − 5) = 1.33. Por debajo gana A, por encima gana B.</p>`;
+  document.getElementById('hexplain').innerHTML=t;
+  document.querySelectorAll('#regime div').forEach(d=>{const r=+d.dataset.r;d.classList.toggle('on',(r===0&&H<0.05)||(r===1&&Math.abs(H-1)<0.05)||(r===2&&H>1.05))});
+}
+document.getElementById('hslider').addEventListener('input',renderH);renderH();
+
+/* ---------- Motor A* / Weighted A* con poda ---------- */
+const ROWS=[
+"......#....#....#.....",
+"...........#....#.....",
+"................#.....",
+"...~~~~...............",
+"...~~~#......~~~......",
+".S.~~~~....#.~~~~~~.G.",
+"......#....#....~~~...",
+"......#....#..........",
+"......#.........#.....",
+"......#....#....#.....",
+"......#....#..........",
+"...........#....#....."];
+const GW=ROWS[0].length,GH=ROWS.length,CELL=34;
+const cost=[],S=[],G=[];
+for(let y=0;y<GH;y++){cost.push([]);for(let x=0;x<GW;x++){const c=ROWS[y][x];cost[y].push(c==='#'?Infinity:c==='~'?3:1);if(c==='S'){S[0]=x;S[1]=y}if(c==='G'){G[0]=x;G[1]=y}}}
+const key=(x,y)=>y*GW+x,kx=k=>k%GW,ky=k=>Math.floor(k/GW);
+const hf=(x,y)=>Math.abs(x-G[0])+Math.abs(y-G[1]);
+function search(Hw,bound){
+  const g=new Map(),par=new Map(),closed=new Set();const open=[];let cnt=0;
+  g.set(key(...S),0);open.push({k:key(...S),g:0,f:Hw*hf(...S),id:cnt++});
+  const steps=[];let pruned=0;
+  while(open.length){
+    open.sort((a,b)=>a.f-b.f||b.g-a.g||a.id-b.id);const n=open.shift();
+    if(closed.has(n.k)||n.g>g.get(n.k))continue;
+    const x=kx(n.k),y=ky(n.k);
+    if(n.k===key(...G)){const path=[];let c=n.k;while(c!==undefined){path.push(c);c=par.get(c)}path.reverse();steps.push({type:'goal',k:n.k,g:n.g,path});return {steps,cost:n.g,path,expanded:steps.length-1,pruned}}
+    closed.add(n.k);const nb=[];
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const x2=x+dx,y2=y+dy;if(x2<0||y2<0||x2>=GW||y2>=GH||cost[y2][x2]===Infinity)continue;
+      const k2=key(x2,y2),g2=n.g+cost[y2][x2];
+      if(g2+hf(x2,y2)>=bound){pruned++;nb.push({k:k2,st:'poda',g:g2,h:hf(x2,y2)});continue}
+      if(closed.has(k2)||g2>=(g.has(k2)?g.get(k2):Infinity)){nb.push({k:k2,st:'rep'});continue}
+      g.set(k2,g2);par.set(k2,n.k);const f=g2+Hw*hf(x2,y2);open.push({k:k2,g:g2,f,id:cnt++});nb.push({k:k2,st:'new',g:g2,h:hf(x2,y2),f})}
+    steps.push({type:'exp',k:n.k,g:n.g,h:hf(x,y),f:n.f,nb,openSize:open.length});
+  }
+  return {steps,cost:null,path:[],expanded:steps.length,pruned};
+}
+
+/* ---------- Dibujo del mapa ---------- */
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function makeMap(svg){
+  svg.setAttribute('viewBox',`0 0 ${GW*CELL} ${GH*CELL}`);svg.innerHTML='';
+  const base=el('g',{},svg),ovs=el('g',{},svg),marks=el('g',{},svg),vals=el('g',{},svg),paths=el('g',{},svg),top=el('g',{},svg);
+  const cells=[];
+  for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){const c=ROWS[y][x];
+    el('rect',{x:x*CELL,y:y*CELL,width:CELL,height:CELL,class:c==='#'?'t-wall':c==='~'?'t-mud':'t-free'},base);
+    const ov=el('rect',{x:x*CELL+2,y:y*CELL+2,width:CELL-4,height:CELL-4,rx:4,class:'ov'},ovs);cells.push({ov,x,y})}
+  for(let x=0;x<=GW;x++)el('line',{x1:x*CELL,y1:0,x2:x*CELL,y2:GH*CELL,class:'grid',style:'stroke:var(--line)'},base);
+  for(let y=0;y<=GH;y++)el('line',{x1:0,y1:y*CELL,x2:GW*CELL,y2:y*CELL,class:'grid',style:'stroke:var(--line)'},base);
+  for(const [p,l] of [[S,'S'],[G,'G']]){el('rect',{x:p[0]*CELL+4,y:p[1]*CELL+4,width:CELL-8,height:CELL-8,rx:6,class:'markbg'},top);const t=el('text',{x:p[0]*CELL+CELL/2,y:p[1]*CELL+CELL/2+6,'text-anchor':'middle',class:'mark'},top);t.textContent=l}
+  return {svg,cells,marks,vals,paths};
+}
+function pathD(path){return path.map((k,i)=>(i?'L':'M')+(kx(k)*CELL+CELL/2)+' '+(ky(k)*CELL+CELL/2)).join('')}
+/* Estado del mapa tras aplicar los pasos 0..i-1 */
+function stateAt(run,i){
+  const closedOrder=[],open=new Map(),pruned=new Set();let cur=null,goal=null;
+  open.set(key(...S),{g:0,h:hf(...S),f:run.H*hf(...S)});
+  for(let j=0;j<i;j++){const s=run.steps[j];
+    if(s.type==='exp'){open.delete(s.k);closedOrder.push(s.k);cur=s.k;
+      s.nb.forEach(n=>{if(n.st==='new'){open.set(n.k,{g:n.g,h:n.h,f:n.f});pruned.delete(n.k)}else if(n.st==='poda'&&!open.has(n.k)&&!closedOrder.includes(n.k))pruned.add(n.k)})}
+    else{open.delete(s.k);goal=s;cur=s.k}}
+  return {closedOrder,open,pruned,cur,goal};
+}
+function paintMap(M,run,i,opts){
+  const st=stateAt(run,i);const closed=new Set(st.closedOrder);const recent=new Set(st.closedOrder.slice(-8));
+  const prevCls=M.prev||[];const newCls=[];
+  M.cells.forEach(({ov,x,y},idx)=>{const k=key(x,y);let c='ov';
+    if(k===st.cur&&!st.goal)c+=' cur';else if(recent.has(k))c+=' recent';else if(closed.has(k))c+=' closed';else if(st.open.has(k))c+=' open';else if(st.pruned.has(k))c+=' pruned';
+    newCls[idx]=c;
+    if(prevCls[idx]!==c){ov.setAttribute('class',c+(opts.animate&&(c.includes('open')||c.includes('cur'))&&!reduced()?' pop':''))}
+  });
+  M.prev=newCls;
+  // marcas de poda
+  M.marks.innerHTML='';
+  st.pruned.forEach(k=>{const x=kx(k)*CELL,y=ky(k)*CELL;el('path',{d:`M${x+11} ${y+11}L${x+CELL-11} ${y+CELL-11}M${x+CELL-11} ${y+11}L${x+11} ${y+CELL-11}`,class:'x'},M.marks)});
+  // valores f
+  M.vals.innerHTML='';
+  if(opts.showF)st.open.forEach((v,k)=>{const t=el('text',{x:kx(k)*CELL+CELL/2,y:ky(k)*CELL+CELL/2+4,'text-anchor':'middle',class:'val'},M.vals);t.textContent=+v.f.toFixed(1)});
+  // caminos
+  M.paths.innerHTML='';
+  if(opts.oldPath&&opts.oldPath.length)el('path',{d:pathD(opts.oldPath),class:'oldpath'},M.paths);
+  if(st.goal){const p=el('path',{d:pathD(st.goal.path),class:'path'+(opts.animate&&!reduced()?' draw':''),pathLength:1},M.paths)}
+  return st;
+}
+
+/* ---------- 2. Una pasada paso a paso ---------- */
+const CODE=[
+ 'frontera ← {S};  g(S) ← 0',
+ 'mientras la frontera no esté vacía:',
+ '  n ← estado de la frontera con menor f = g + H·h',
+ '  si n es la meta: devolver el camino',
+ '  pasar n a cerrados',
+ '  para cada vecino v de n:',
+ '    g′ ← g(n) + costo(n, v)',
+ '    si v es nuevo o g′ &lt; g(v):',
+ '      g(v) ← g′;  padre(v) ← n;  v a la frontera',
+ 'si se vacía: no existe camino'];
+const code1=document.getElementById('code1');
+code1.innerHTML=CODE.map((c,i)=>`<div data-l="${i}"><span class="ln">${i+1}</span>${c}</div>`).join('');
+let hlTimer=[];
+function highlight(lines,animate){hlTimer.forEach(clearTimeout);hlTimer=[];const divs=code1.querySelectorAll('div');
+  const show=l=>divs.forEach((d,i)=>d.classList.toggle('hl',i===l));
+  if(!animate||reduced()){divs.forEach((d,i)=>d.classList.toggle('hl',i===lines[lines.length-1]));return}
+  lines.forEach((l,j)=>hlTimer.push(setTimeout(()=>show(l),j*110)))}
+const M1=makeMap(document.getElementById('map1'));
+const HS=[1,1.5,2,3];let H1=1,run1,i1=0,t1=null;
+const hb=document.getElementById('hbtns');
+HS.forEach(h=>{const b=document.createElement('button');b.type='button';b.textContent='H = '+h;b.setAttribute('aria-pressed',h===1);b.addEventListener('click',()=>{H1=h;[...hb.children].forEach(x=>x.setAttribute('aria-pressed',x===b));setup1()});hb.appendChild(b)});
+function bump(id,v){const e=document.getElementById(id);if(e.textContent!==String(v)){e.textContent=v;if(!reduced()){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}}
+function setup1(){stop1();run1=search(H1,Infinity);run1.H=H1;i1=0;M1.prev=null;render1(false)}
+function render1(animate){
+  const st=paintMap(M1,run1,i1,{animate,showF:document.getElementById('showf').checked});
+  bump('st-step',i1);bump('st-exp',st.closedOrder.length);bump('st-open',st.open.size);bump('st-cost',st.goal?st.goal.g:'—');
+  const ex=document.getElementById('ex1');let html='';
+  if(i1===0){html=`<b>Inicio.</b> La frontera solo tiene a S, con g = 0 y h = ${hf(...S)}. ${H1===1?'Con H = 1 esto es A* normal.':`Con H = ${H1}, f = ${H1}·${hf(...S)} = ${H1*hf(...S)}: la búsqueda se va a inclinar hacia la meta.`}`;highlight([0],false)}
+  else{const s=run1.steps[i1-1];const x=kx(s.k),y=ky(s.k);
+    if(s.type==='goal'){html=`<b>Meta alcanzada en el paso ${i1}.</b> El camino cuesta ${s.g} y se exploraron ${st.closedOrder.length} celdas. ${H1===1?'Con H = 1 este costo es el óptimo.':`Con H = ${H1} se garantiza que cuesta como mucho ${H1} veces el óptimo. Prueba H = 1 y compara cuántas celdas explora y cuánto cuesta.`}`;highlight([2,3],animate)}
+    else{const nw=s.nb.filter(n=>n.st==='new').length,rp=s.nb.filter(n=>n.st==='rep').length;
+      html=`<b>Se explora la celda (${x}, ${y}).</b> Es la de menor f en la frontera: f = ${s.g} + ${H1===1?'':H1+'·'}${s.h} = ${+s.f.toFixed(1)}${cost[y][x]===3?'. Está en lodo, por eso su g subió 3 de golpe':''}. Agrega ${nw} vecino${nw===1?'':'s'} a la frontera${rp?` y descarta ${rp} que ya tenía${rp===1?'':'n'} un camino igual o mejor`:''}.`;
+      highlight([2,3,4,5,6,7,8],animate)}}
+  ex.innerHTML=`<div class="explain-in">${html}</div>`;
+  document.getElementById('s-step').disabled=i1>=run1.steps.length;document.getElementById('s-end').disabled=i1>=run1.steps.length;
+}
+function stop1(){if(t1){clearInterval(t1);t1=null;document.getElementById('s-play').textContent='Reproducir'}}
+function speed(){const v=+document.getElementById('s-speed').value;return 900-v*80}
+document.getElementById('s-step').addEventListener('click',()=>{stop1();if(i1<run1.steps.length){i1++;render1(true)}});
+document.getElementById('s-reset').addEventListener('click',()=>{stop1();i1=0;M1.prev=null;render1(false)});
+document.getElementById('s-end').addEventListener('click',()=>{stop1();i1=run1.steps.length;render1(true)});
+document.getElementById('showf').addEventListener('change',()=>render1(false));
+document.getElementById('s-play').addEventListener('click',e=>{if(t1){stop1();return}if(i1>=run1.steps.length){i1=0;M1.prev=null;render1(false)}e.target.textContent='Pausar';
+  const tick=()=>{if(i1<run1.steps.length){i1++;render1(true)}else stop1()};t1=setInterval(tick,speed())});
+document.getElementById('s-speed').addEventListener('input',()=>{if(t1){clearInterval(t1);t1=setInterval(()=>{if(i1<run1.steps.length){i1++;render1(true)}else stop1()},speed())}});
+setup1();
+
+/* ---------- 3. Anytime: las cuatro pasadas ---------- */
+const PH=[3,2,1.5,1];const passes=[];let best=Infinity,bestPath=[];
+const h0=hf(...S);
+PH.forEach((H,i)=>{const r=search(H,best);r.H=H;r.prevBest=best;r.prevPath=bestPath.slice();
+  if(r.cost!==null&&r.cost<best){best=r.cost;bestPath=r.path}
+  r.best=best;r.lb=Math.max(h0,H===1&&r.steps.length?best:best/H);if(H===1)r.lb=best;passes.push(r)});
+const astar=search(1,Infinity);
+const totalAny=passes.reduce((s,p)=>s+p.expanded,0);
+document.getElementById('cost-note').textContent=`En este mapa las 4 pasadas exploran ${totalAny} celdas en total, contra ${astar.expanded} de un A* directo. A cambio, el primer plan llega tras ${passes[0].expanded}.`;
+const tb=document.querySelector('#ptable tbody');
+passes.forEach((p,i)=>{const tr=document.createElement('tr');tr.dataset.i=i;
+  tr.innerHTML=`<td>${i+1}</td><td class="mono">${p.H}</td><td>${p.expanded}</td><td>${p.pruned}</td><td>${p.cost===null?'ninguno mejor':p.cost}</td><td>${p.H===1?'óptimo':'≤ '+p.H+' × óptimo'}</td><td class="mono">${p.lb===p.best?p.best:`${+p.lb.toFixed(1)} y ${p.best}`}</td>`;tb.appendChild(tr)});
+// gráfica
+const ch=document.getElementById('chart');const cw=360,chh=220,pl=40,pr=14,pt=14,pb=34;
+const ymin=Math.floor(h0-2),ymax=Math.ceil(passes[0].best+2);
+const X=i=>pl+i*((cw-pl-pr)/(passes.length-1)),Y=v=>pt+(ymax-v)/(ymax-ymin)*(chh-pt-pb);
+function drawChart(sel){ch.innerHTML='';
+  for(let v=Math.ceil(ymin/5)*5;v<=ymax;v+=5){el('line',{x1:pl,x2:cw-pr,y1:Y(v),y2:Y(v),class:'gridl'},ch);const t=el('text',{x:pl-6,y:Y(v)+4,'text-anchor':'end'},ch);t.textContent=v}
+  el('line',{x1:pl,x2:cw-pr,y1:chh-pb,y2:chh-pb,class:'axis'},ch);
+  passes.forEach((p,i)=>{const t=el('text',{x:X(i),y:chh-pb+16,'text-anchor':'middle'},ch);t.textContent='H='+p.H});
+  const bandPts=passes.map((p,i)=>`${X(i)},${Y(p.best)}`).concat(passes.slice().reverse().map((p,j)=>`${X(passes.length-1-j)},${Y(p.lb)}`));
+  el('polygon',{points:bandPts.join(' '),class:'band'},ch);
+  el('polyline',{points:passes.map((p,i)=>`${X(i)},${Y(p.lb)}`).join(' '),class:'lb'},ch);
+  el('polyline',{points:passes.map((p,i)=>`${X(i)},${Y(p.best)}`).join(' '),class:'best'},ch);
+  passes.forEach((p,i)=>{el('circle',{cx:X(i),cy:Y(p.best),r:i===sel?8:5,class:'dot'+(i===sel?' on':'')},ch);
+    const t=el('text',{x:X(i),y:Y(p.best)-12,'text-anchor':'middle',class:'lbl'},ch);t.textContent=p.best});
+}
+const M2=makeMap(document.getElementById('map2'));
+let ps=0,i2=0,t2=null,chain=false;
+const pb_=document.getElementById('pbtns');
+passes.forEach((p,i)=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.textContent=`Pasada ${i+1} · H = ${p.H}`;b.addEventListener('click',()=>{stop2();selPass(i,true)});pb_.appendChild(b)});
+function selPass(i,showAll){ps=i;[...pb_.children].forEach((b,j)=>b.setAttribute('aria-selected',j===i));
+  [...tb.children].forEach((tr,j)=>tr.classList.toggle('on',j===i));drawChart(i);
+  i2=showAll?passes[i].steps.length:0;M2.prev=null;render2(false)}
+function render2(animate){const p=passes[ps];
+  const st=paintMap(M2,p,i2,{animate,showF:false,oldPath:p.prevBest<Infinity?p.prevPath:[]});
+  let html=`<h3 style="font-size:16px;margin-bottom:6px">Pasada ${ps+1} · H = ${p.H}</h3>`;
+  const done=i2>=p.steps.length;
+  if(!done)html+=`<p>Explorando… ${st.closedOrder.length} celdas, ${st.pruned.size} podadas por ahora.</p>`;
+  else if(p.cost!==null)html+=`<p>Encuentra un camino de costo <b>${p.cost}</b> explorando ${p.expanded} celdas${p.pruned?` y podando ${p.pruned} vecinos`:''}.${p.prevBest<Infinity?` Mejora al plan anterior de ${p.prevBest}.`:' Es el primer plan: llega rápido aunque cruza lodo.'}</p>`;
+  else html+=`<p>No encuentra nada más barato que ${p.prevBest}: todo lo demás se poda.</p>`;
+  if(done)html+=p.H===1?`<p class="note" style="margin-top:6px">Esta pasada es A* con H = 1 y terminó, así que ${p.best} es el óptimo probado.</p>`:`<p class="note" style="margin-top:6px">Garantía: el óptimo es al menos ${+p.lb.toFixed(1)}, porque ${p.best} ≤ ${p.H} × óptimo y h(S) = ${h0}.</p>`;
+  document.getElementById('ex2').innerHTML=`<div class="explain-in">${html}</div>`;
+}
+function stop2(){if(t2){clearInterval(t2);t2=null}chain=false;document.getElementById('p-play').textContent='Reproducir pasada';document.getElementById('p-all').textContent='Reproducir las 4'}
+function play2(){i2=0;M2.prev=null;render2(false);const p=passes[ps];const step=Math.max(1,Math.round(p.steps.length/45));
+  t2=setInterval(()=>{if(i2<p.steps.length){i2=Math.min(p.steps.length,i2+step);render2(true)}else{clearInterval(t2);t2=null;
+    if(chain&&ps<passes.length-1){setTimeout(()=>{if(!chain)return;selPass(ps+1,false);play2()},900)}else stop2()}},70)}
+document.getElementById('p-play').addEventListener('click',e=>{if(t2){stop2();return}e.target.textContent='Pausar';play2()});
+document.getElementById('p-all').addEventListener('click',e=>{if(chain||t2){stop2();return}chain=true;e.target.textContent='Detener';selPass(0,false);play2()});
+selPass(0,true);
+})();
+</script>

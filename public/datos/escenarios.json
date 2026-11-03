@@ -1,0 +1,446 @@
+{
+ "perfiles": {
+  "regular": {
+   "Cnorm": 30,
+   "Cmax": 36,
+   "beta": 0.1,
+   "K": 7
+  },
+  "medio_tiempo": {
+   "Cnorm": 24,
+   "Cmax": 30,
+   "beta": 0.1,
+   "K": 7
+  }
+ },
+ "alumnos": [
+  {
+   "id": "ISW-E1",
+   "malla": "ISW",
+   "tipo": "E1",
+   "nombre": "Nuevo ingreso",
+   "descripcion": "Sin materias aprobadas",
+   "aprobadas": [],
+   "periodo_inicio": "Sep"
+  },
+  {
+   "id": "ISW-E2",
+   "malla": "ISW",
+   "tipo": "E2",
+   "nombre": "Daniel Ortega",
+   "descripcion": "Regular: aprobó los niveles 1 y 2",
+   "aprobadas": [
+    "ISW01",
+    "ISW02",
+    "ISW03",
+    "ISW04",
+    "ISW05",
+    "ISW06",
+    "ISW07",
+    "ISW08",
+    "ISW09",
+    "ISW10"
+   ],
+   "periodo_inicio": "May"
+  },
+  {
+   "id": "ISW-E3",
+   "malla": "ISW",
+   "tipo": "E3",
+   "nombre": "Ana Ruiz",
+   "descripcion": "Irregular: reprobó Cálculo diferencial",
+   "aprobadas": [
+    "ISW02",
+    "ISW03",
+    "ISW04",
+    "ISW05",
+    "ISW07",
+    "ISW08",
+    "ISW09"
+   ],
+   "periodo_inicio": "May"
+  },
+  {
+   "id": "ISW-E4",
+   "malla": "ISW",
+   "tipo": "E4",
+   "nombre": "Marco Silva",
+   "descripcion": "Irregular: reprobó la materia 11",
+   "aprobadas": [
+    "ISW01",
+    "ISW02",
+    "ISW03",
+    "ISW04",
+    "ISW05",
+    "ISW06",
+    "ISW07",
+    "ISW08",
+    "ISW09",
+    "ISW10",
+    "ISW12",
+    "ISW13",
+    "ISW14",
+    "ISW15"
+   ],
+   "periodo_inicio": "Sep"
+  },
+  {
+   "id": "IRC-E1",
+   "malla": "IRC",
+   "tipo": "E1",
+   "nombre": "Nuevo ingreso",
+   "descripcion": "Sin materias aprobadas",
+   "aprobadas": [],
+   "periodo_inicio": "Sep"
+  },
+  {
+   "id": "IRC-E2",
+   "malla": "IRC",
+   "tipo": "E2",
+   "nombre": "Daniel Ortega",
+   "descripcion": "Regular: aprobó los niveles 1 y 2",
+   "aprobadas": [
+    "IRC01",
+    "IRC02",
+    "IRC03",
+    "IRC04",
+    "IRC05",
+    "IRC06",
+    "IRC07",
+    "IRC08",
+    "IRC09",
+    "IRC10"
+   ],
+   "periodo_inicio": "May"
+  },
+  {
+   "id": "IRC-E3",
+   "malla": "IRC",
+   "tipo": "E3",
+   "nombre": "Ana Ruiz",
+   "descripcion": "Irregular: reprobó Cálculo diferencial",
+   "aprobadas": [
+    "IRC02",
+    "IRC03",
+    "IRC04",
+    "IRC05",
+    "IRC07",
+    "IRC08",
+    "IRC09"
+   ],
+   "periodo_inicio": "May"
+  },
+  {
+   "id": "IRC-E4",
+   "malla": "IRC",
+   "tipo": "E4",
+   "nombre": "Marco Silva",
+   "descripcion": "Irregular: reprobó la materia 11",
+   "aprobadas": [
+    "IRC01",
+    "IRC02",
+    "IRC03",
+    "IRC04",
+    "IRC05",
+    "IRC06",
+    "IRC07",
+    "IRC08",
+    "IRC09",
+    "IRC10",
+    "IRC12",
+    "IRC13",
+    "IRC14",
+    "IRC15"
+   ],
+   "periodo_inicio": "Sep"
+  },
+  {
+   "id": "ICD-E1",
+   "malla": "ICD",
+   "tipo": "E1",
+   "nombre": "Nuevo ingreso",
+   "descripcion": "Sin materias aprobadas",
+   "aprobadas": [],
+   "periodo_inicio": "Sep"
+  },
+  {
+   "id": "ICD-E2",
+   "malla": "ICD",
+   "tipo": "E2",
+   "nombre": "Daniel Ortega",
+   "descripcion": "Regular: aprobó los niveles 1 y 2",
+   "aprobadas": [
+    "ICD01",
+    "ICD02",
+    "ICD03",
+    "ICD04",
+    "ICD05",
+    "ICD06",
+    "ICD07",
+    "ICD08",
+    "ICD09",
+    "ICD10"
+   ],
+   "periodo_inicio": "May"
+  },
+  {
+   "id": "ICD-E3",
+   "malla": "ICD",
+   "tipo": "E3",
+   "nombre": "Ana Ruiz",
+   "descripcion": "Irregular: reprobó Cálculo diferencial",
+   "aprobadas": [
+    "ICD02",
+    "ICD03",
+    "ICD04",
+    "ICD05",
+    "ICD07",
+    "ICD08",
+    "ICD09"
+   ],
+   "periodo_inicio": "May"
+  },
+  {
+   "id": "ICD-E4",
+   "malla": "ICD",
+   "tipo": "E4",
+   "nombre": "Marco Silva",
+   "descripcion": "Irregular: reprobó la materia 11",
+   "aprobadas": [
+    "ICD01",
+    "ICD02",
+    "ICD03",
+    "ICD04",
+    "ICD05",
+    "ICD06",
+    "ICD07",
+    "ICD08",
+    "ICD09",
+    "ICD10",
+    "ICD12",
+    "ICD13",
+    "ICD14",
+    "ICD15"
+   ],
+   "periodo_inicio": "Sep"
+  }
+ ],
+ "metas": [
+  {
+   "id": "ISW-M1",
+   "malla": "ISW",
+   "nombre": "Titulación con especialidad A",
+   "materias": [
+    "ISW01",
+    "ISW02",
+    "ISW03",
+    "ISW04",
+    "ISW05",
+    "ISW06",
+    "ISW07",
+    "ISW08",
+    "ISW09",
+    "ISW10",
+    "ISW11",
+    "ISW12",
+    "ISW13",
+    "ISW14",
+    "ISW15",
+    "ISW16",
+    "ISW17",
+    "ISW18",
+    "ISW19",
+    "ISW20",
+    "ISW21",
+    "ISW22",
+    "ISW23",
+    "ISW24",
+    "ISW25",
+    "ISW28"
+   ]
+  },
+  {
+   "id": "ISW-M2",
+   "malla": "ISW",
+   "nombre": "Llegar a la estadía",
+   "materias": [
+    "ISW01",
+    "ISW02",
+    "ISW03",
+    "ISW04",
+    "ISW05",
+    "ISW06",
+    "ISW07",
+    "ISW08",
+    "ISW09",
+    "ISW10",
+    "ISW11",
+    "ISW12",
+    "ISW13",
+    "ISW14",
+    "ISW15",
+    "ISW16",
+    "ISW17",
+    "ISW18",
+    "ISW19",
+    "ISW20",
+    "ISW21",
+    "ISW22",
+    "ISW23"
+   ]
+  },
+  {
+   "id": "ISW-M3",
+   "malla": "ISW",
+   "nombre": "Especialidad B",
+   "materias": [
+    "ISW26",
+    "ISW27"
+   ]
+  },
+  {
+   "id": "IRC-M1",
+   "malla": "IRC",
+   "nombre": "Titulación con especialidad A",
+   "materias": [
+    "IRC01",
+    "IRC02",
+    "IRC03",
+    "IRC04",
+    "IRC05",
+    "IRC06",
+    "IRC07",
+    "IRC08",
+    "IRC09",
+    "IRC10",
+    "IRC11",
+    "IRC12",
+    "IRC13",
+    "IRC14",
+    "IRC15",
+    "IRC16",
+    "IRC17",
+    "IRC18",
+    "IRC19",
+    "IRC20",
+    "IRC21",
+    "IRC22",
+    "IRC23",
+    "IRC24",
+    "IRC25",
+    "IRC28"
+   ]
+  },
+  {
+   "id": "IRC-M2",
+   "malla": "IRC",
+   "nombre": "Llegar a la estadía",
+   "materias": [
+    "IRC01",
+    "IRC02",
+    "IRC03",
+    "IRC04",
+    "IRC05",
+    "IRC06",
+    "IRC07",
+    "IRC08",
+    "IRC09",
+    "IRC10",
+    "IRC11",
+    "IRC12",
+    "IRC13",
+    "IRC14",
+    "IRC15",
+    "IRC16",
+    "IRC17",
+    "IRC18",
+    "IRC19",
+    "IRC20",
+    "IRC21",
+    "IRC22",
+    "IRC23"
+   ]
+  },
+  {
+   "id": "IRC-M3",
+   "malla": "IRC",
+   "nombre": "Especialidad B",
+   "materias": [
+    "IRC26",
+    "IRC27"
+   ]
+  },
+  {
+   "id": "ICD-M1",
+   "malla": "ICD",
+   "nombre": "Titulación con especialidad A",
+   "materias": [
+    "ICD01",
+    "ICD02",
+    "ICD03",
+    "ICD04",
+    "ICD05",
+    "ICD06",
+    "ICD07",
+    "ICD08",
+    "ICD09",
+    "ICD10",
+    "ICD11",
+    "ICD12",
+    "ICD13",
+    "ICD14",
+    "ICD15",
+    "ICD16",
+    "ICD17",
+    "ICD18",
+    "ICD19",
+    "ICD20",
+    "ICD21",
+    "ICD22",
+    "ICD23",
+    "ICD24",
+    "ICD25",
+    "ICD28"
+   ]
+  },
+  {
+   "id": "ICD-M2",
+   "malla": "ICD",
+   "nombre": "Llegar a la estadía",
+   "materias": [
+    "ICD01",
+    "ICD02",
+    "ICD03",
+    "ICD04",
+    "ICD05",
+    "ICD06",
+    "ICD07",
+    "ICD08",
+    "ICD09",
+    "ICD10",
+    "ICD11",
+    "ICD12",
+    "ICD13",
+    "ICD14",
+    "ICD15",
+    "ICD16",
+    "ICD17",
+    "ICD18",
+    "ICD19",
+    "ICD20",
+    "ICD21",
+    "ICD22",
+    "ICD23"
+   ]
+  },
+  {
+   "id": "ICD-M3",
+   "malla": "ICD",
+   "nombre": "Especialidad B",
+   "materias": [
+    "ICD26",
+    "ICD27"
+   ]
+  }
+ ]
+}

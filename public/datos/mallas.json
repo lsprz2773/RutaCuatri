@@ -1,0 +1,1477 @@
+{
+ "version": "1.0",
+ "periodos": [
+  "Ene",
+  "May",
+  "Sep"
+ ],
+ "mallas": [
+  {
+   "id": "ISW",
+   "nombre": "Ingeniería en Desarrollo de Software",
+   "plan": "2026",
+   "especialidades": {
+    "A": "Desarrollo móvil",
+    "B": "Ciencia de datos aplicada"
+   },
+   "materias": [
+    {
+     "clave": "ISW01",
+     "nombre": "Cálculo diferencial",
+     "creditos": 6,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW02",
+     "nombre": "Matemáticas discretas",
+     "creditos": 6,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW03",
+     "nombre": "Fundamentos de programación",
+     "creditos": 8,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW04",
+     "nombre": "Inglés I",
+     "creditos": 5,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW05",
+     "nombre": "Comunicación oral y escrita",
+     "creditos": 4,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW06",
+     "nombre": "Cálculo integral",
+     "creditos": 6,
+     "nivel": 2,
+     "prerrequisitos": [
+      "ISW01"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW07",
+     "nombre": "Programación orientada a objetos",
+     "creditos": 8,
+     "nivel": 2,
+     "prerrequisitos": [
+      "ISW03"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW08",
+     "nombre": "Bases de datos",
+     "creditos": 7,
+     "nivel": 2,
+     "prerrequisitos": [
+      "ISW03"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW09",
+     "nombre": "Inglés II",
+     "creditos": 5,
+     "nivel": 2,
+     "prerrequisitos": [
+      "ISW04"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW10",
+     "nombre": "Probabilidad y estadística",
+     "creditos": 6,
+     "nivel": 2,
+     "prerrequisitos": [
+      "ISW01"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW11",
+     "nombre": "Estructuras de datos",
+     "creditos": 8,
+     "nivel": 3,
+     "prerrequisitos": [
+      "ISW02",
+      "ISW07"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW12",
+     "nombre": "Métodos numéricos",
+     "creditos": 6,
+     "nivel": 3,
+     "prerrequisitos": [
+      "ISW06"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW13",
+     "nombre": "Ingeniería de requerimientos",
+     "creditos": 5,
+     "nivel": 3,
+     "prerrequisitos": [
+      "ISW05"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW14",
+     "nombre": "Desarrollo web",
+     "creditos": 7,
+     "nivel": 3,
+     "prerrequisitos": [
+      "ISW07",
+      "ISW08"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW15",
+     "nombre": "Inglés III",
+     "creditos": 5,
+     "nivel": 3,
+     "prerrequisitos": [
+      "ISW09"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW16",
+     "nombre": "Sistemas operativos",
+     "creditos": 7,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ISW11"
+     ],
+     "oferta": [
+      "Ene",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW17",
+     "nombre": "Arquitectura de software",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ISW07",
+      "ISW13"
+     ],
+     "oferta": [
+      "Ene",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW18",
+     "nombre": "Redes de computadoras",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ISW03"
+     ],
+     "oferta": [
+      "Ene",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW19",
+     "nombre": "Inglés IV",
+     "creditos": 5,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ISW15"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW20",
+     "nombre": "Pruebas de software",
+     "creditos": 6,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ISW17"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW21",
+     "nombre": "Seguridad informática",
+     "creditos": 6,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ISW16",
+      "ISW18"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW22",
+     "nombre": "Gestión de proyectos de software",
+     "creditos": 5,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ISW13"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW23",
+     "nombre": "Proyecto integrador",
+     "creditos": 8,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ISW14",
+      "ISW17"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW24",
+     "nombre": "Desarrollo móvil I",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ISW14"
+     ],
+     "oferta": [
+      "Sep"
+     ],
+     "tipo": "optativa",
+     "especialidad": "A",
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW25",
+     "nombre": "Desarrollo móvil II",
+     "creditos": 6,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ISW24"
+     ],
+     "oferta": [
+      "Ene"
+     ],
+     "tipo": "optativa",
+     "especialidad": "A",
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW26",
+     "nombre": "Análisis de datos",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ISW08",
+      "ISW10"
+     ],
+     "oferta": [
+      "Sep"
+     ],
+     "tipo": "optativa",
+     "especialidad": "B",
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW27",
+     "nombre": "Aprendizaje automático",
+     "creditos": 7,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ISW26",
+      "ISW12"
+     ],
+     "oferta": [
+      "Ene"
+     ],
+     "tipo": "optativa",
+     "especialidad": "B",
+     "exclusiva": false
+    },
+    {
+     "clave": "ISW28",
+     "nombre": "Estadía profesional",
+     "creditos": 30,
+     "nivel": 6,
+     "prerrequisitos": [
+      "ISW01",
+      "ISW02",
+      "ISW03",
+      "ISW04",
+      "ISW05",
+      "ISW06",
+      "ISW07",
+      "ISW08",
+      "ISW09",
+      "ISW10",
+      "ISW11",
+      "ISW12",
+      "ISW13",
+      "ISW14",
+      "ISW15",
+      "ISW16",
+      "ISW17",
+      "ISW18",
+      "ISW19",
+      "ISW20",
+      "ISW21",
+      "ISW22",
+      "ISW23"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": true
+    }
+   ]
+  },
+  {
+   "id": "IRC",
+   "nombre": "Ingeniería en Redes y Ciberseguridad",
+   "plan": "2026",
+   "especialidades": {
+    "A": "Cómputo en la nube",
+    "B": "Internet de las cosas"
+   },
+   "materias": [
+    {
+     "clave": "IRC01",
+     "nombre": "Cálculo diferencial",
+     "creditos": 6,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC02",
+     "nombre": "Fundamentos de redes",
+     "creditos": 7,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC03",
+     "nombre": "Fundamentos de programación",
+     "creditos": 8,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC04",
+     "nombre": "Inglés I",
+     "creditos": 5,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC05",
+     "nombre": "Electrónica digital",
+     "creditos": 5,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC06",
+     "nombre": "Cálculo integral",
+     "creditos": 6,
+     "nivel": 2,
+     "prerrequisitos": [
+      "IRC01"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC07",
+     "nombre": "Enrutamiento y conmutación",
+     "creditos": 7,
+     "nivel": 2,
+     "prerrequisitos": [
+      "IRC02"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC08",
+     "nombre": "Programación de scripts",
+     "creditos": 6,
+     "nivel": 2,
+     "prerrequisitos": [
+      "IRC03"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC09",
+     "nombre": "Inglés II",
+     "creditos": 5,
+     "nivel": 2,
+     "prerrequisitos": [
+      "IRC04"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC10",
+     "nombre": "Arquitectura de computadoras",
+     "creditos": 6,
+     "nivel": 2,
+     "prerrequisitos": [
+      "IRC05"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC11",
+     "nombre": "Sistemas operativos Linux",
+     "creditos": 7,
+     "nivel": 3,
+     "prerrequisitos": [
+      "IRC08",
+      "IRC10"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC12",
+     "nombre": "Redes de área amplia",
+     "creditos": 7,
+     "nivel": 3,
+     "prerrequisitos": [
+      "IRC07"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC13",
+     "nombre": "Probabilidad y estadística",
+     "creditos": 6,
+     "nivel": 3,
+     "prerrequisitos": [
+      "IRC06"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC14",
+     "nombre": "Fundamentos de ciberseguridad",
+     "creditos": 6,
+     "nivel": 3,
+     "prerrequisitos": [
+      "IRC02",
+      "IRC08"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC15",
+     "nombre": "Inglés III",
+     "creditos": 5,
+     "nivel": 3,
+     "prerrequisitos": [
+      "IRC09"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC16",
+     "nombre": "Administración de servidores",
+     "creditos": 7,
+     "nivel": 4,
+     "prerrequisitos": [
+      "IRC11"
+     ],
+     "oferta": [
+      "Ene",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC17",
+     "nombre": "Criptografía",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "IRC13",
+      "IRC14"
+     ],
+     "oferta": [
+      "Ene",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC18",
+     "nombre": "Seguridad perimetral",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "IRC12",
+      "IRC14"
+     ],
+     "oferta": [
+      "Ene",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC19",
+     "nombre": "Inglés IV",
+     "creditos": 5,
+     "nivel": 4,
+     "prerrequisitos": [
+      "IRC15"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC20",
+     "nombre": "Hacking ético",
+     "creditos": 7,
+     "nivel": 5,
+     "prerrequisitos": [
+      "IRC16",
+      "IRC18"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC21",
+     "nombre": "Gestión de la seguridad de la información",
+     "creditos": 5,
+     "nivel": 5,
+     "prerrequisitos": [
+      "IRC17"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC22",
+     "nombre": "Respuesta a incidentes",
+     "creditos": 6,
+     "nivel": 5,
+     "prerrequisitos": [
+      "IRC18"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC23",
+     "nombre": "Proyecto integrador",
+     "creditos": 8,
+     "nivel": 5,
+     "prerrequisitos": [
+      "IRC16",
+      "IRC18"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC24",
+     "nombre": "Cómputo en la nube I",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "IRC11"
+     ],
+     "oferta": [
+      "Sep"
+     ],
+     "tipo": "optativa",
+     "especialidad": "A",
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC25",
+     "nombre": "Cómputo en la nube II",
+     "creditos": 6,
+     "nivel": 5,
+     "prerrequisitos": [
+      "IRC24"
+     ],
+     "oferta": [
+      "Ene"
+     ],
+     "tipo": "optativa",
+     "especialidad": "A",
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC26",
+     "nombre": "Internet de las cosas",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "IRC10",
+      "IRC12"
+     ],
+     "oferta": [
+      "Sep"
+     ],
+     "tipo": "optativa",
+     "especialidad": "B",
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC27",
+     "nombre": "Redes industriales",
+     "creditos": 6,
+     "nivel": 5,
+     "prerrequisitos": [
+      "IRC26"
+     ],
+     "oferta": [
+      "Ene"
+     ],
+     "tipo": "optativa",
+     "especialidad": "B",
+     "exclusiva": false
+    },
+    {
+     "clave": "IRC28",
+     "nombre": "Estadía profesional",
+     "creditos": 30,
+     "nivel": 6,
+     "prerrequisitos": [
+      "IRC01",
+      "IRC02",
+      "IRC03",
+      "IRC04",
+      "IRC05",
+      "IRC06",
+      "IRC07",
+      "IRC08",
+      "IRC09",
+      "IRC10",
+      "IRC11",
+      "IRC12",
+      "IRC13",
+      "IRC14",
+      "IRC15",
+      "IRC16",
+      "IRC17",
+      "IRC18",
+      "IRC19",
+      "IRC20",
+      "IRC21",
+      "IRC22",
+      "IRC23"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": true
+    }
+   ]
+  },
+  {
+   "id": "ICD",
+   "nombre": "Ingeniería en Ciencia de Datos",
+   "plan": "2026",
+   "especialidades": {
+    "A": "Inteligencia de negocios",
+    "B": "Procesamiento de lenguaje"
+   },
+   "materias": [
+    {
+     "clave": "ICD01",
+     "nombre": "Cálculo diferencial",
+     "creditos": 6,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD02",
+     "nombre": "Álgebra lineal",
+     "creditos": 6,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD03",
+     "nombre": "Fundamentos de programación",
+     "creditos": 8,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD04",
+     "nombre": "Inglés I",
+     "creditos": 5,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD05",
+     "nombre": "Introducción a la ciencia de datos",
+     "creditos": 4,
+     "nivel": 1,
+     "prerrequisitos": [],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD06",
+     "nombre": "Cálculo integral",
+     "creditos": 6,
+     "nivel": 2,
+     "prerrequisitos": [
+      "ICD01"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD07",
+     "nombre": "Programación en Python",
+     "creditos": 7,
+     "nivel": 2,
+     "prerrequisitos": [
+      "ICD03"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD08",
+     "nombre": "Bases de datos",
+     "creditos": 7,
+     "nivel": 2,
+     "prerrequisitos": [
+      "ICD03"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD09",
+     "nombre": "Inglés II",
+     "creditos": 5,
+     "nivel": 2,
+     "prerrequisitos": [
+      "ICD04"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD10",
+     "nombre": "Probabilidad",
+     "creditos": 6,
+     "nivel": 2,
+     "prerrequisitos": [
+      "ICD01"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD11",
+     "nombre": "Cálculo multivariable",
+     "creditos": 6,
+     "nivel": 3,
+     "prerrequisitos": [
+      "ICD06",
+      "ICD02"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD12",
+     "nombre": "Estadística inferencial",
+     "creditos": 6,
+     "nivel": 3,
+     "prerrequisitos": [
+      "ICD10"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD13",
+     "nombre": "Estructuras de datos y algoritmos",
+     "creditos": 7,
+     "nivel": 3,
+     "prerrequisitos": [
+      "ICD07"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD14",
+     "nombre": "Visualización de datos",
+     "creditos": 6,
+     "nivel": 3,
+     "prerrequisitos": [
+      "ICD07",
+      "ICD05"
+     ],
+     "oferta": [
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD15",
+     "nombre": "Inglés III",
+     "creditos": 5,
+     "nivel": 3,
+     "prerrequisitos": [
+      "ICD09"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD16",
+     "nombre": "Optimización",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ICD11",
+      "ICD02"
+     ],
+     "oferta": [
+      "Ene",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD17",
+     "nombre": "Aprendizaje automático",
+     "creditos": 8,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ICD12",
+      "ICD13",
+      "ICD02"
+     ],
+     "oferta": [
+      "Ene",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD18",
+     "nombre": "Bases de datos no relacionales",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ICD08"
+     ],
+     "oferta": [
+      "Ene",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD19",
+     "nombre": "Inglés IV",
+     "creditos": 5,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ICD15"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD20",
+     "nombre": "Aprendizaje profundo",
+     "creditos": 7,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ICD17",
+      "ICD16"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD21",
+     "nombre": "Big data",
+     "creditos": 7,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ICD18",
+      "ICD13"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD22",
+     "nombre": "Ética y gobierno de datos",
+     "creditos": 4,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ICD14"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD23",
+     "nombre": "Proyecto integrador",
+     "creditos": 8,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ICD17",
+      "ICD18",
+      "ICD14"
+     ],
+     "oferta": [
+      "Ene",
+      "May"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD24",
+     "nombre": "Inteligencia de negocios",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ICD14",
+      "ICD08"
+     ],
+     "oferta": [
+      "Sep"
+     ],
+     "tipo": "optativa",
+     "especialidad": "A",
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD25",
+     "nombre": "Analítica avanzada",
+     "creditos": 6,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ICD24",
+      "ICD12"
+     ],
+     "oferta": [
+      "Ene"
+     ],
+     "tipo": "optativa",
+     "especialidad": "A",
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD26",
+     "nombre": "Procesamiento de lenguaje natural",
+     "creditos": 6,
+     "nivel": 4,
+     "prerrequisitos": [
+      "ICD13",
+      "ICD10"
+     ],
+     "oferta": [
+      "Sep"
+     ],
+     "tipo": "optativa",
+     "especialidad": "B",
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD27",
+     "nombre": "Modelos de lenguaje",
+     "creditos": 7,
+     "nivel": 5,
+     "prerrequisitos": [
+      "ICD26",
+      "ICD17"
+     ],
+     "oferta": [
+      "Ene"
+     ],
+     "tipo": "optativa",
+     "especialidad": "B",
+     "exclusiva": false
+    },
+    {
+     "clave": "ICD28",
+     "nombre": "Estadía profesional",
+     "creditos": 30,
+     "nivel": 6,
+     "prerrequisitos": [
+      "ICD01",
+      "ICD02",
+      "ICD03",
+      "ICD04",
+      "ICD05",
+      "ICD06",
+      "ICD07",
+      "ICD08",
+      "ICD09",
+      "ICD10",
+      "ICD11",
+      "ICD12",
+      "ICD13",
+      "ICD14",
+      "ICD15",
+      "ICD16",
+      "ICD17",
+      "ICD18",
+      "ICD19",
+      "ICD20",
+      "ICD21",
+      "ICD22",
+      "ICD23"
+     ],
+     "oferta": [
+      "Ene",
+      "May",
+      "Sep"
+     ],
+     "tipo": "obligatoria",
+     "especialidad": null,
+     "exclusiva": true
+    }
+   ]
+  }
+ ]
+}

@@ -3,7 +3,7 @@ import { anytime } from "./anytime.ts";
 import { validar } from "./validacion.ts";
 import { aEstrella, costoUniforme, wastar } from "./wastar.ts";
 import { MAX_EXPANSIONES } from "./tipos.ts";
-import type { FinPasada, Problema } from "./tipos.ts";
+import type { Cuatrimestre, FinPasada, Problema } from "./tipos.ts";
 
 export type Metodo = "anytime" | "astar" | "wastar2" | "uniforme";
 
@@ -16,6 +16,7 @@ export const NOMBRE_METODO: Record<Metodo, string> = {
 
 export interface ResultadoMetodo {
   costo: number | null;
+  plan: Cuatrimestre[] | null;
   cuatrimestres: number | null;
   sobrecarga: number | null;
   expansiones: number;
@@ -33,6 +34,7 @@ export function correrMetodo(
   if (validar(pb).length > 0) {
     return {
       costo: null,
+      plan: null,
       cuatrimestres: null,
       sobrecarga: null,
       expansiones: 0,
@@ -49,6 +51,7 @@ export function correrMetodo(
     const ultima = r.pasadas.at(-1);
     return {
       costo: r.costo,
+      plan: r.plan,
       cuatrimestres: r.plan?.length ?? null,
       sobrecarga: r.plan
         ? r.plan.reduce((s, q) => s + Math.max(0, q.creditos - pb.Cnorm), 0)
@@ -68,6 +71,7 @@ export function correrMetodo(
         : wastar(pb, 2, Infinity, limite);
   return {
     costo: r.costo,
+    plan: r.plan,
     cuatrimestres: r.plan?.length ?? null,
     sobrecarga: r.plan ? r.plan.reduce((s, q) => s + Math.max(0, q.creditos - pb.Cnorm), 0) : null,
     expansiones: r.expansiones,

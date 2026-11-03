@@ -9,7 +9,8 @@ import {
   problemaDe,
 } from "../src/estado/derivados.ts";
 import { explicar } from "../src/estado/explicacion.ts";
-import { anytime } from "../src/motor/index.ts";
+import { aEstrella, anytime, correrMetodo } from "../src/motor/index.ts";
+import { alternativas, metaSin, variantesSensibilidad } from "../src/estado/analisis.ts";
 import type { Materia } from "../src/motor/tipos.ts";
 
 describe("metas de la pantalla 4", () => {
@@ -66,5 +67,59 @@ describe("textos", () => {
     expect(formatoCosto(7)).toBe("7.0");
     expect(formatoCosto(6.4000000000000004)).toBe("6.4");
     expect(formatoCosto(6.65)).toBe("6.65");
+  });
+});
+
+describe("pantallas 7 a 9", () => {
+  const e1 = () => borradorDeAlumno(ESCENARIOS.alumnos.find((a) => a.id === "ISW-E1")!);
+
+  it("la sensibilidad de ISW-E1 coincide con los valores de referencia del experimento D", () => {
+    const esperado: Record<string, [number, number, number]> = {
+      base: [6.4, 6, 4],
+      "Penalización β = 0.05": [6.2, 6, 4],
+      "Penalización β = 0.2": [6.8, 6, 4],
+      "Penalización β = 0.5": [7.0, 7, 0],
+      "Carga normal = 27": [7.4, 7, 4],
+      "Carga normal = 33": [6.0, 6, 0],
+      "Carga máxima = 30": [7.0, 7, 0],
+      "Carga máxima = 33": [6.4, 6, 4],
+      "Carga máxima = 40": [6.4, 6, 4],
+    };
+    const b = e1();
+    const pb = problemaDe(b);
+    const filas = variantesSensibilidad(b.parametros);
+    expect(filas).toHaveLength(9);
+    for (const v of filas) {
+      const r = correrMetodo({ ...pb, ...v.parametros }, "astar", null);
+      const [costo, n, sobre] = esperado[v.base ? "base" : v.etiqueta];
+      expect(r.costo).toBeCloseTo(costo, 9);
+      expect(r.cuatrimestres).toBe(n);
+      expect(r.sobrecarga).toBe(sobre);
+    }
+  });
+
+  it("en cada cuatrimestre del plan, la alternativa elegida tiene el menor costo total", () => {
+    const pb = problemaDe(e1());
+    const r = anytime(pb);
+    let g = 0;
+    r.plan!.forEach((q, i) => {
+      const alts = alternativas(pb, r.plan!, i + 1);
+      expect(alts[0].elegida).toBe(true);
+      const total = (a: (typeof alts)[number]) =>
+        g + a.costo + aEstrella({ ...pb, inicio: a.despues }).costo!;
+      const elegida = total(alts[0]);
+      expect(elegida).toBeCloseTo(r.costo!, 9);
+      for (const a of alts.slice(1)) expect(total(a)).toBeGreaterThanOrEqual(elegida - 1e-9);
+      g += q.costo;
+    });
+  });
+
+  it("metaSin quita la materia y lo que depende de ella", () => {
+    const b = e1();
+    const meta = clavesMeta(b.materias, "malla", "A", []);
+    const sin = metaSin(b.materias, meta, "ISW23");
+    expect(sin).not.toContain("ISW23");
+    expect(sin).not.toContain("ISW28");
+    expect(sin).toContain("ISW22");
   });
 });

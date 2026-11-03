@@ -20,6 +20,8 @@ export interface Store {
   fijarResultado: (r: ResultadoPlan | null) => void;
   fijarBusqueda: (f: (e: EstadoBusqueda) => EstadoBusqueda) => void;
   guardar: (etiqueta: PlanGuardado["etiqueta"]) => void;
+  /** Guarda otro escenario (por ejemplo, una fila del análisis) sin cambiar el borrador actual. */
+  guardarEscenario: (b: Borrador, r: ResultadoPlan, etiqueta: PlanGuardado["etiqueta"]) => void;
   borrarGuardado: (id: string) => void;
   importarGuardados: (planes: PlanGuardado[]) => void;
 }
@@ -71,6 +73,19 @@ export const useStore = create<Store>()(
         const resto = s.guardados.filter((g) => g.id !== id);
         set({ idActual: id, guardados: [plan, ...resto].slice(0, MAX_GUARDADOS) });
       },
+      guardarEscenario: (b, r, etiqueta) =>
+        set((s) => ({
+          guardados: [
+            {
+              id: nuevoId(),
+              fecha: new Date().toISOString(),
+              etiqueta,
+              borrador: structuredClone(b),
+              resultado: r,
+            },
+            ...s.guardados,
+          ].slice(0, MAX_GUARDADOS),
+        })),
       borrarGuardado: (id) => set((s) => ({ guardados: s.guardados.filter((g) => g.id !== id) })),
       importarGuardados: (planes) =>
         set((s) => {

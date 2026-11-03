@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+coverage
+test-results
+playwright-report
+docs
+public/datos
+pruebas/casos-prueba.json
+resultados
+*.md
+package-lock.json

@@ -30,3 +30,20 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
 - **Pruebas:** no aplica.
 - **Commit:** `docs: documentación inicial`.
 - **Pendiente:** paso 2.
+
+## 2026-11-03 02:17 · Paso 2 · Proyecto base
+
+- **Hecho:** Next.js 16.4.4 (App Router, `src/`, TypeScript estricto, `output: "export"`), Tailwind 4, ESLint 9 con `eslint-config-prettier`, Prettier, Vitest 5, Zustand 5 y Zod 4, todos con versión exacta en `package.json`. Fuentes IBM Plex Sans y Mono con `next/font`. Prueba mínima de datos y `npm run build` genera `out/`.
+- **Decisiones:**
+  - El generador no acepta el nombre `_base` (las reglas de npm prohíben el guion bajo inicial); se generó en `_base/rutacuatri`, se movió a `v1/` y se borró `_base/`.
+  - Se quitaron `cacheComponents` y `partialPrefetching` que trae la plantilla: la aplicación es una SPA estática y no los necesita.
+  - `@types/node` fijado en 22 (coincide con Node 22 y lo exige Vitest 5).
+  - `trailingSlash: true` para que la exportación estática genere `ruta/index.html`.
+  - `allowImportingTsExtensions`: el motor importa con extensión `.ts` para que `scripts/experimento.ts` corra con `node` directamente, sin agregar otra herramienta.
+  - `AGENTS.md`, que genera `next dev`, queda fuera de git.
+  - `.gitattributes` con `eol=lf` para que Prettier y git no choquen en Windows.
+  - Prettier ignora `docs/`, `public/datos/`, `pruebas/casos-prueba.json` y los `.md` para no tocar la documentación.
+- **Problemas:** conflicto de dependencias entre Vitest 5 y `@types/node` 20; se resolvió con la versión 22.
+- **Pruebas:** lint ok, typecheck ok, 1/1 prueba, build ok.
+- **Commit:** `chore: proyecto base con Next.js, Tailwind, Vitest, Zustand y Zod`.
+- **Pendiente:** paso 3, el motor.

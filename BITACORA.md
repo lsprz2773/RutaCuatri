@@ -78,3 +78,11 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
 - **Pruebas:** 94 pruebas de Vitest (se agregaron metas, Ana Ruiz con su explicación, CSV y textos), lint ok, build ok. Revisión manual en el navegador: ejemplo de Ana Ruiz (5.0 en 5), validación de malla y kárdex que bloquea «Continuar», cambio de perfil en la pantalla 4 y búsqueda en el Worker.
 - **Commit:** `feat(interfaz): worker, store y pantallas 1 a 6`.
 - **Pendiente:** paso 5 (detalle, análisis, sin plan; revisar la vista de celular a 390 px).
+
+## 2026-11-03 03:25 · Paso 5 · Pantallas 7 a 10
+
+- **Hecho:** detalle de un cuatrimestre (`/plan/resultado/[n]`, rutas 1 a 40 generadas de antemano), análisis de escenarios (sensibilidad con A* por fila, comparación de los 4 métodos, filas nuevas y «Guardar escenario»), y «Sin plan posible» con la causa y las tres opciones. La vista de celular y «Repruebo una» se hicieron en el paso 4.
+- **Decisiones:** la tabla de alternativas calcula A* para la elegida, hasta 40 sucesores, «Ninguna» y «Todas», y muestra 8 filas. «Planear sin la materia» quita también las materias de la meta que dependen de ella. La sensibilidad usa el borrador actual como base.
+- **Problemas:** un error de ESLint de memoización en «Sin plan»; corregido. El commit 9359c1e entró con un aviso de Prettier en un archivo; se corrigió en el commit siguiente.
+- **Pruebas:** 97/97 (incluye la sensibilidad de ISW-E1 contra el experimento D y que la alternativa elegida tiene el menor costo total en cada cuatrimestre), lint ok, build ok.
+- **Pendiente:** revisar en el navegador las pantallas 7 a 10 (sobre todo 390 px sin desplazamiento horizontal); pasos 6 a 8.

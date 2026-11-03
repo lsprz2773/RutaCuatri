@@ -47,3 +47,17 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
 - **Pruebas:** lint ok, typecheck ok, 1/1 prueba, build ok.
 - **Commit:** `chore: proyecto base con Next.js, Tailwind, Vitest, Zustand y Zod`.
 - **Pendiente:** paso 3, el motor.
+
+## 2026-11-03 02:34 · Paso 3 · Motor y 77 casos
+
+- **Hecho:** `src/motor` con `tipos.ts`, `problema.ts` (máscaras de bits, materias necesarias y utilidades), `validacion.ts`, `heuristica.ts`, `sucesores.ts`, `monticulo.ts`, `wastar.ts` (con `aEstrella` y `costoUniforme`) y `anytime.ts`. Esquemas Zod de los datos en `src/datos/esquemas.ts`. Pruebas en `pruebas/`: `motor.test.ts` (72 escenarios, T01 a T05, validación y eventos), `verificador.ts` (verificador de planes que trabaja con claves, sin máscaras ni funciones del motor), `azar.ts` y `propiedades.test.ts` (200 mallas al azar de 8 a 11 materias).
+- **Decisiones:**
+  - Los sucesores se generan en el mismo orden que el oráculo (exclusivas primero y luego combinaciones por tamaño en orden lexicográfico) y la frontera usa la misma llave de desempate, para que los planes coincidan también en número de cuatrimestres.
+  - `wastar` acepta dos parámetros opcionales además del contrato: `opciones.reglas` (desactiva D06 a D08 para el experimento C y las pruebas de propiedad) y `opciones.heuristica` (h = 0, Costo Uniforme). El contrato de cuatro parámetros no cambia.
+  - La validación agrega dos comprobaciones dentro de la regla 1: claves repetidas y el límite de 31 materias (D16). Los errores de oferta y créditos son los únicos que llevan a «Sin plan» (`esSinPlan`).
+  - «Sin reglas» significa: entran todas las disponibles (no solo las necesarias), sin poda por dominancia y con el cuatrimestre vacío siempre. La Estadía sigue yendo sola (D09 no es parte del experimento).
+  - Se agregó `"type": "module"` a `package.json` y `erasableSyntaxOnly` a `tsconfig.json` para que el motor corra con `node` sin compilar.
+- **Problemas:** Node en modo de solo quitar tipos no acepta propiedades en el constructor; se reescribió el montículo.
+- **Pruebas:** 77/77 casos (72 escenarios con costo, cuatrimestres, h(inicio) y créditos de sobrecarga; 5 especiales), garantía costo ≤ H·C* en cada pasada, verificador independiente en todos los planes, y las propiedades en 200 mallas (con poda = sin poda, admisibilidad, consistencia). 89 pruebas en verde, lint ok.
+- **Commit:** `feat(motor): validación, heurística, sucesores y Anytime A* con los 77 casos`.
+- **Pendiente:** paso 4.

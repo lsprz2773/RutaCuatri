@@ -61,3 +61,20 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
 - **Pruebas:** 77/77 casos (72 escenarios con costo, cuatrimestres, h(inicio) y créditos de sobrecarga; 5 especiales), garantía costo ≤ H·C* en cada pasada, verificador independiente en todos los planes, y las propiedades en 200 mallas (con poda = sin poda, admisibilidad, consistencia). 89 pruebas en verde, lint ok.
 - **Commit:** `feat(motor): validación, heurística, sucesores y Anytime A* con los 77 casos`.
 - **Pendiente:** paso 4.
+
+## 2026-11-03 03:10 · Paso 4 · Worker, store y pantallas 1 a 6
+
+- **Hecho:** Worker del motor (`src/worker/motor.worker.ts`, con mensajes `anytime` y `lote`), cliente del Worker, store de Zustand con persistencia en `localStorage` (`rutacuatri:v1`), gestor de búsqueda (`src/estado/busqueda.ts`: eventos en vivo, Detener = `terminate()`), datos validados con Zod al cargar, importación y exportación de CSV de malla y kárdex, y las pantallas Inicio, Plan de estudios, Historial, Meta y parámetros, Búsqueda y pasadas y Plan del estudiante, con los componentes de tarjeta de cuatrimestre, tabla de materias, mapa de seriación y gráfica de créditos en SVG (con su tabla equivalente). La pantalla 6 ya incluye la vista de celular (pantalla 10) y «Repruebo una».
+- **Decisiones:**
+  - Al abrir un alumno de ejemplo se usa la meta M1 (titulación con especialidad A) y el perfil regular, se lanza la búsqueda en el Worker y se va directo al resultado.
+  - Las 4 metas se calculan a partir de la malla: «toda la malla» = obligatorias + optativas de la especialidad elegida + exclusivas (M1); «llegar a la estadía» = obligatorias no exclusivas (M2); «bloque de optativas» = optativas de la especialidad (M3). Una prueba comprueba que reproducen las 9 metas de `escenarios.json`.
+  - Los alumnos E3 y E4 se cargan con su materia reprobada marcada como «reprobada» (01 y 11), según la tabla de la sección 1 de decisiones.md.
+  - Cada búsqueda terminada (o detenida con plan) se guarda sola en «Planes guardados» (máximo 20); un caso sin plan se guarda con la etiqueta «sin plan».
+  - Pesos H: la pasada con H = 1 no se puede quitar y las nuevas se ordenan de mayor a menor. El desempate por avance se muestra siempre activo (D11 no es opcional).
+  - Los datos se importan en el paquete (`import` de los JSON) en lugar de pedirlos con `fetch`.
+  - «Estados ≤ 3·2ⁿ» en la pantalla 4 usa n = materias pendientes, como en la maqueta; en la pantalla 2 usa el total de materias.
+  - El año del plan empieza en 1 y sube cada vez que el cuatrimestre cae en enero.
+- **Problemas:** el campo de prerrequisitos borraba la coma al escribir; ahora se aplica al salir del campo o con Enter. El texto de la pantalla 5 atribuía el plan final a la primera pasada; se corrigió para listar las mejoras. `tsc` revisaba la carpeta `out/`; se excluyó. Con ISW-E1, M1 y medio tiempo las pasadas dan 10.0 (17), 9.6 (22), 8.8 (77) y 8.5 (2,918); decisiones.md menciona 9.6 (23) y 8.9 (119) en las pasadas intermedias: las pasadas intermedias dependen del orden de la frontera y no se comparan; el óptimo y las 2,918 expansiones de A* coinciden.
+- **Pruebas:** 94 pruebas de Vitest (se agregaron metas, Ana Ruiz con su explicación, CSV y textos), lint ok, build ok. Revisión manual en el navegador: ejemplo de Ana Ruiz (5.0 en 5), validación de malla y kárdex que bloquea «Continuar», cambio de perfil en la pantalla 4 y búsqueda en el Worker.
+- **Commit:** `feat(interfaz): worker, store y pantallas 1 a 6`.
+- **Pendiente:** paso 5 (detalle, análisis, sin plan; revisar la vista de celular a 390 px).

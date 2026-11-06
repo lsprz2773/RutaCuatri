@@ -121,7 +121,7 @@ export function DetalleCuatrimestre({ n }: { n: number }) {
         {q.materias.length} con {q.creditos}.
       </p>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <Tarjeta className="min-w-0">
           <Titulo>Materias disponibles en este periodo</Titulo>
           {datos.disp.length === 0 && (
@@ -154,7 +154,7 @@ export function DetalleCuatrimestre({ n }: { n: number }) {
           </ul>
 
           <h2 className="mt-8 mb-3 text-lg font-semibold">Qué pasaría con otra elección</h2>
-          <div className="overflow-x-auto">
+          <div className="relative overflow-x-auto">
             <table className="w-full min-w-[34rem] text-left" data-alternativas>
               <thead>
                 <tr className="border-b border-gray-300 text-gray-600">

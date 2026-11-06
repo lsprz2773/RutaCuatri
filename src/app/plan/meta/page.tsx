@@ -110,7 +110,7 @@ export default function MetaYParametros() {
 
   return (
     <Pagina>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-w-0 space-y-6">
           <Tarjeta>
             <Titulo>¿Qué quieres terminar?</Titulo>

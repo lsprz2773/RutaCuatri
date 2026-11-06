@@ -5,7 +5,7 @@ export function MapaSeriacion({ materias, cadena }: { materias: Materia[]; caden
   const niveles = [...new Set(materias.map((m) => m.nivel))].sort((a, b) => a - b);
   const enCadena = new Set(cadena);
   return (
-    <div className="overflow-x-auto">
+    <div className="relative overflow-x-auto">
       <div
         className="grid min-w-[36rem] gap-3"
         style={{ gridTemplateColumns: `repeat(${Math.max(niveles.length, 1)}, minmax(0, 1fr))` }}

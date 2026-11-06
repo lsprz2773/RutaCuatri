@@ -113,7 +113,7 @@ export default function Resultado() {
               </>
             }
           />
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
             <Tarjeta className="min-w-0">
               <Titulo>Cuatrimestres</Titulo>
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" data-plan>

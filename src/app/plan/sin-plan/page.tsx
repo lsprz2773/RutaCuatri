@@ -96,7 +96,7 @@ export default function SinPlan() {
           </p>
         </section>
 
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           <Tarjeta>
             <Titulo>Causa</Titulo>
             <dl className="grid grid-cols-[6.5rem_1fr] gap-y-2">

@@ -95,3 +95,12 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
 - **Pruebas:** el experimento D reproduce los 12 valores de referencia y el A los 72 costos óptimos. En el C, las expansiones sin reglas dan 8,644 / 1,423 / 2,807 contra 8,645 / 1,423 / 2,808 de decisiones.md (sección 3.1), con el mismo costo.
 - **Commit:** `feat(experimento): experimentos A a D con CSV en resultados/`.
 - **Pendiente:** revisar las pantallas 7 a 10 en el navegador, pasos 7 y 8.
+
+## 2026-11-06 15:50 · Paso 7 · Pruebas E2E con Playwright (y revisión de las pantallas 7 a 10)
+
+- **Hecho:** `@playwright/test` 1.65.0 y Chromium descargado. `playwright.config.ts` corre las pruebas contra la exportación estática (`out/`) con un servidor propio sin dependencias (`scripts/servir.ts`). `pruebas/e2e/flujo.spec.ts` cubre los flujos de la sección 6: Ana Ruiz recorriendo las pantallas 2 a 6 hasta el plan de 5.0 en 5 cuatrimestres (con el total de las tarjetas igual al costo), T03 que termina en Sin plan sin buscar, Detener que corta en menos de 1 s y conserva el mejor plan, y 390 px sin desplazamiento horizontal en el resultado y en las demás pantallas. Revisión manual de las pantallas 7 a 10: la alternativa elegida tiene el menor costo total, el análisis llena la sensibilidad y la comparación de métodos, y «Repruebo una» vuelve a planear desde el periodo siguiente.
+- **Decisiones:** la prueba de Detener usa una malla sintética de 18 materias sin seriación (con las mallas reales la búsqueda termina en milisegundos). La comprobación de 390 px se extendió a todas las pantallas.
+- **Problemas:** a 390 px las pantallas con tablas tenían desplazamiento horizontal: las casillas `sr-only` de la tabla son absolutas y escapaban del contenedor con scroll; se resolvió con `relative` en los contenedores y una columna explícita en las cuadrículas. La «Lectura» del análisis decía que nada cambiaba aunque subiera el costo; ahora menciona los cambios de costo.
+- **Pruebas:** 4/4 E2E, 97/97 Vitest, lint ok, build ok.
+- **Commit:** `test(e2e): flujos de Playwright y corrección de desplazamiento a 390 px`.
+- **Pendiente:** paso 8.

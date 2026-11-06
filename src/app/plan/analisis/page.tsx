@@ -104,8 +104,19 @@ export default function Analisis() {
 
   const lectura = () => {
     if (!base || Object.keys(filas).length < variantes.length) return "Calculando…";
-    if (cambian.length === 0)
-      return `Ningún cambio de un solo parámetro mueve el egreso: el plan sigue en ${base.cuatrimestres} cuatrimestres.`;
+    if (cambian.length === 0) {
+      const encarecen = variantes.filter((v) => {
+        const r = filas[v.etiqueta];
+        return !v.base && r?.costo != null && base.costo != null && r.costo > base.costo + 1e-9;
+      });
+      return `Ningún cambio de un solo parámetro mueve el egreso: el plan sigue en ${base.cuatrimestres} cuatrimestres.${
+        encarecen.length > 0
+          ? ` Solo sube el costo por sobrecarga con ${encarecen
+              .map((v) => `${v.etiqueta} (${formatoCosto(filas[v.etiqueta].costo!)})`)
+              .join(", ")}.`
+          : ""
+      }`;
+    }
     const menos = cambian.filter((v) => filas[v.etiqueta].cuatrimestres! < base.cuatrimestres!);
     const mas = cambian.filter((v) => filas[v.etiqueta].cuatrimestres! > base.cuatrimestres!);
     const partes: string[] = [];
@@ -162,10 +173,10 @@ export default function Analisis() {
         cambiando un solo parámetro.
       </p>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <Tarjeta className="min-w-0">
           <Titulo>Sensibilidad</Titulo>
-          <div className="overflow-x-auto">
+          <div className="relative overflow-x-auto">
             <table className="w-full min-w-[32rem] text-left" data-sensibilidad>
               <thead>
                 <tr className="border-b border-gray-300 text-gray-600">
@@ -254,7 +265,7 @@ export default function Analisis() {
             <p className="-mt-2 mb-3 text-sm text-gray-600">
               Escenario actual · {b.materias.length} materias · tiempo máximo 60 s por método
             </p>
-            <div className="overflow-x-auto">
+            <div className="relative overflow-x-auto">
               <table className="w-full text-left text-sm" data-metodos>
                 <thead>
                   <tr className="border-b border-gray-300 text-gray-600">

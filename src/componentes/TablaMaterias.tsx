@@ -58,7 +58,7 @@ export function TablaMaterias({ materias, conError, alCambiar, alQuitar }: Props
   };
   const numero = (v: string) => Math.max(1, Math.round(Number(v) || 1));
   return (
-    <div className="overflow-x-auto">
+    <div className="relative overflow-x-auto">
       <table className="w-full min-w-[52rem] border-collapse text-left text-sm">
         <thead>
           <tr className="text-gray-600">

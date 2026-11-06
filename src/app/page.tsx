@@ -161,7 +161,7 @@ export default function Inicio() {
           Cuatro alumnos por malla con la meta de titulación con especialidad A y el perfil regular.
           Al abrir uno se calcula su plan.
         </p>
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {MALLAS.map((malla) => (
             <div key={malla.id}>
               <h3 className="mb-2 font-semibold text-gray-800">{malla.nombre}</h3>

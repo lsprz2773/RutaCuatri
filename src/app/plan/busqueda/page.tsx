@@ -73,7 +73,7 @@ export default function Busqueda() {
 
   return (
     <Pagina>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-w-0 space-y-6">
           <section
             className="flex flex-col gap-4 rounded-xl border-2 border-blue-700 bg-white p-6 md:flex-row md:items-center md:justify-between"
@@ -118,7 +118,7 @@ export default function Busqueda() {
 
           <Tarjeta>
             <Titulo>Pasadas</Titulo>
-            <div className="overflow-x-auto">
+            <div className="relative overflow-x-auto">
               <table className="w-full min-w-[34rem] text-left" data-tabla-pasadas>
                 <thead>
                   <tr className="border-b border-gray-300 text-gray-600">

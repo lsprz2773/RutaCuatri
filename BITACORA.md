@@ -86,3 +86,12 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
 - **Problemas:** un error de ESLint de memoización en «Sin plan»; corregido. El commit 9359c1e entró con un aviso de Prettier en un archivo; se corrigió en el commit siguiente.
 - **Pruebas:** 97/97 (incluye la sensibilidad de ISW-E1 contra el experimento D y que la alternativa elegida tiene el menor costo total en cada cuatrimestre), lint ok, build ok.
 - **Pendiente:** revisar en el navegador las pantallas 7 a 10 (sobre todo 390 px sin desplazamiento horizontal); pasos 6 a 8.
+
+## 2026-11-06 15:25 · Paso 6 · Experimento A a D
+
+- **Hecho:** `scripts/experimento.ts` (se corre con `npm run experimento`; `-- --repeticiones N` cambia las 5 repeticiones). Escribe `resultados/experimento-a.csv` (72 escenarios, una fila por pasada), `experimento-b.csv` (24 escenarios M1 × 4 métodos), `experimento-c.csv` (A* con y sin D06 a D08) y `experimento-d.csv` (sensibilidad de ISW-E1), más `resultados/equipo.txt` con procesador, memoria y versión de Node. El script compara contra los valores esperados y termina con error si algo no coincide.
+- **Decisiones:** el tiempo reportado es la mediana de 5 repeticiones; costos y expansiones son los de la primera corrida (no cambian). La memoria de Anytime es el máximo de estados guardados entre sus pasadas. El experimento D agrega las filas K = 5 y K = 6 de la tabla de referencia.
+- **Problemas:** ninguno. Todo el experimento tarda unos 7 s; ninguna corrida llega al límite de 60 s, ni siquiera Costo Uniforme.
+- **Pruebas:** el experimento D reproduce los 12 valores de referencia y el A los 72 costos óptimos. En el C, las expansiones sin reglas dan 8,644 / 1,423 / 2,807 contra 8,645 / 1,423 / 2,808 de decisiones.md (sección 3.1), con el mismo costo.
+- **Commit:** `feat(experimento): experimentos A a D con CSV en resultados/`.
+- **Pendiente:** revisar las pantallas 7 a 10 en el navegador, pasos 7 y 8.

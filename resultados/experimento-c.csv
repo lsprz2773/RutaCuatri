@@ -1,0 +1,7 @@
+alumno,costo_con_reglas,expansiones_con_reglas,tiempo_con_reglas_ms,costo_sin_reglas,expansiones_sin_reglas,tiempo_sin_reglas_ms,razon_expansiones,mismo_costo
+ISW-E1,8.5,2918,30.120,8.5,8644,554.431,2.96,si
+ISW-E3,6.6,1084,9.215,6.6,2453,72.009,2.26,si
+IRC-E1,8.6,393,3.738,8.6,1423,49.074,3.62,si
+IRC-E3,7.6,33,0.089,7.6,450,6.203,13.64,si
+ICD-E1,8.5,574,3.922,8.5,2807,131.506,4.89,si
+ICD-E3,7.6,15,0.038,7.6,284,8.266,18.93,si

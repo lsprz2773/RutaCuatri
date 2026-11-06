@@ -1,0 +1,7 @@
+Procesador: 13th Gen Intel(R) Core(TM) i5-13420H (12 hilos)
+Memoria: 15.7 GiB
+Node: v22.20.0
+Sistema: win32 10.0.26200
+Repeticiones por corrida: 5 (se reporta la mediana del tiempo)
+Límites: 60 s por corrida y 200000 expansiones por pasada
+Fecha: 2026-11-06T21:22:31.389Z

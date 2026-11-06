@@ -20,7 +20,7 @@ Para que el estado inicial, la meta y el escenario cambien en cada ejecución, e
   \begin{center}
     \caption{Reglas comunes a las tres mallas}
     \label{TAB::Mallas}
-    \begin{tabular}{|| p{3.5cm} | p{10cm} ||}
+    \begin{tabular}{|| p{3cm} | p{9cm} ||}
         \hline
         Elemento & Regla \\ [0.5ex]
         \hline\hline
@@ -46,7 +46,7 @@ Cada malla trae cuatro estudiantes tipo (Tabla~\ref{TAB::Alumnos}) y tres metas:
   \begin{center}
     \caption{Estudiantes tipo, iguales en las tres mallas}
     \label{TAB::Alumnos}
-    \begin{tabular}{|| l | p{6.5cm} | l ||}
+    \begin{tabular}{|| p{5.2cm} | p{5.2cm} | l ||}
         \hline
         Estudiante & Materias aprobadas & Inscribe en \\ [0.5ex]
         \hline\hline
@@ -151,7 +151,7 @@ Antes de buscar se valida el problema. Si toda clave de prerrequisito existe y n
 El estado inicial lo elige el usuario en cada ejecución. Tres ejemplos de la malla ISW:
 \begin{enumerate}
     \item \textbf{Nuevo ingreso (ISW-E1):} $(\emptyset, \text{Sep})$. No tiene materias aprobadas y entra en septiembre, que es cuando la malla abre el primer nivel. Las cinco materias del nivel 1 están disponibles.
-    \item \textbf{Ana Ruiz (ISW-E3):} $(\{\text{ISW02}, \text{ISW03}, \text{ISW04}, \text{ISW05}, \text{ISW07}, \text{ISW08}, \text{ISW09}\}, \text{May})$. Aprobó siete materias de los niveles 1 y 2 pero reprobó Cálculo diferencial (ISW01). En mayo puede llevar ISW01, ISW11, ISW13, ISW14 e ISW15. Cálculo diferencial encabeza la cadena ISW01 $\to$ ISW06 $\to$ ISW12 $\to$ ISW28, así que su materia reprobada marca el ritmo del plan.
+    \item \textbf{Ana Ruiz (ISW-E3):} $(A_0, \text{May})$ con $A_0 = \{$ISW02, ISW03, ISW04, ISW05, ISW07, ISW08, ISW09$\}$. Aprobó siete materias de los niveles 1 y 2 pero reprobó Cálculo diferencial (ISW01). En mayo puede llevar ISW01, ISW11, ISW13, ISW14 e ISW15. Cálculo diferencial encabeza la cadena ISW01 $\to$ ISW06 $\to$ ISW12 $\to$ ISW28, así que su materia reprobada marca el ritmo del plan.
     \item \textbf{Marco Silva (ISW-E4):} aprobó de la ISW01 a la ISW15 excepto Estructuras de datos (ISW11) e inscribe en septiembre. ISW11 abre Sistemas operativos y de ahí Seguridad informática, así que también encabeza una cadena de cuatro materias hasta la estadía.
 \end{enumerate}
 
@@ -198,7 +198,8 @@ La Tabla~\ref{TAB::Transiciones} lista los tipos de transición.
   \begin{center}
     \caption{Tipos de transición desde $(A, p)$}
     \label{TAB::Transiciones}
-    \begin{tabular}{|| p{3.3cm} | p{5cm} | p{2.4cm} | p{3cm} ||}
+    \small
+    \begin{tabular}{|| p{2.6cm} | p{3.6cm} | p{3.8cm} | p{3.2cm} ||}
         \hline
         Transición & Resultado & Costo & Condición \\ [0.5ex]
         \hline\hline

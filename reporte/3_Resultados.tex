@@ -8,7 +8,7 @@ Se presentan cuatro casos de ejecución desde la interfaz y, después, los cuatr
 Ana Ruiz estudia Ingeniería en Desarrollo de Software (ISW). Aprobó siete materias de los dos primeros niveles, reprobó Cálculo diferencial (ISW01) y su siguiente inscripción es en mayo. Quiere saber en cuántos cuatrimestres termina la carrera con la especialidad A si lleva la carga regular. El caso no es trivial porque Cálculo diferencial encabeza la cadena más larga que le falta, ISW01 $\to$ ISW06 $\to$ ISW12 $\to$ ISW28, y varias materias de los niveles 3 a 5 solo se abren en dos periodos.
 
 \subsection{Estado inicial y meta}
-El estado inicial es $(A_0, \text{May})$ con $A_0 = \{\text{ISW02}, \text{ISW03}, \text{ISW04}, \text{ISW05}, \text{ISW07}, \text{ISW08}, \text{ISW09}\}$. La Figura~\ref{FIG::C1Historial} muestra la pantalla de historial: ISW01 aparece como reprobada, las materias disponibles en mayo tienen borde punteado y el panel derecho muestra $A_0$, $p_0$ y la cota inicial $h = 4$.
+El estado inicial es $(A_0, \text{May})$ con $A_0 = \{$ISW02, ISW03, ISW04, ISW05, ISW07, ISW08, ISW09$\}$. La Figura~\ref{FIG::C1Historial} muestra la pantalla de historial: ISW01 aparece como reprobada, las materias disponibles en mayo tienen borde punteado y el panel derecho muestra $A_0$, $p_0$ y la cota inicial $h = 4$.
 
 \begin{figure}[H]
     \centering
@@ -197,7 +197,7 @@ La Figura~\ref{FIG::ExpA} muestra el costo del mejor plan contra las expansiones
         ]
             \addplot[const plot, thick, blue, mark=*,
                 nodes near coords, point meta=explicit symbolic,
-                every node near coord/.append style={font=\footnotesize, anchor=south}] coordinates {
+                every node near coord/.append style={font=\footnotesize, anchor=south west, fill=white, inner sep=1pt, xshift=2pt, yshift=2pt}] coordinates {
                 (17,10.0)[$H=3$: 10.0]
                 (39,9.6)[$H=2$: 9.6]
                 (116,8.8)[$H=1.5$: 8.8]
@@ -237,7 +237,7 @@ Se compararon Anytime A*, A*, Weighted A* con $H = 2$ y Costo Uniforme en los 24
     \centering
     \begin{tikzpicture}
         \begin{axis}[
-            xbar, width=0.85\textwidth, height=6cm,
+            xbar, width=0.72\textwidth, height=6cm,
             xlabel={Nodos expandidos en los 24 escenarios},
             ytick={1,2,3,4},
             yticklabels={Weighted A* ($H=2$), A*, Anytime A*, Costo Uniforme},

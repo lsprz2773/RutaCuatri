@@ -122,3 +122,10 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
 - **Pruebas:** 97/97 Vitest, 4/4 E2E, lint ok.
 - **Commit:** `docs(reporte): reporte en LaTeX con capturas, código y experimentos`.
 - **Pendiente:** compilar el reporte en Overleaf y revisar el PDF.
+
+## 2026-11-06 · Compilación del reporte
+
+- **Hecho:** se instaló MiKTeX en el equipo y el reporte compila con `pdflatex` → `bibtex` → `pdflatex` → `pdflatex`: 56 páginas, sin errores, sin cajas desbordadas y sin referencias sin resolver. Revisión visual de todas las páginas.
+- **Problemas:** la plantilla original traía dos errores: opciones de idioma pasadas a `geometry` y un `$` sin cerrar en la portada (`D E$`) del archivo `.sty`; se corrigieron en la copia de `reporte/`, sin tocar la carpeta original. Se ajustaron anchos de tablas, dos conjuntos en modo matemático que no se podían partir, la gráfica de barras y las etiquetas de la gráfica del experimento A.
+- **Decisiones:** el PDF y los archivos auxiliares de LaTeX quedan fuera de git; el PDF se genera al compilar.
+- **Commit:** `docs(reporte): compilación limpia con pdflatex`.

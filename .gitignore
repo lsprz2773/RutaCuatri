@@ -9,3 +9,14 @@ CLAUDE.md
 .claude/
 *.tsbuildinfo
 next-env.d.ts
+reporte/*.aux
+reporte/*.log
+reporte/*.toc
+reporte/*.lof
+reporte/*.lot
+reporte/*.lol
+reporte/*.out
+reporte/*.bbl
+reporte/*.blg
+reporte/*.pdf
+reporte/bib.out

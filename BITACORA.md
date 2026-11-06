@@ -104,3 +104,12 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
 - **Pruebas:** 4/4 E2E, 97/97 Vitest, lint ok, build ok.
 - **Commit:** `test(e2e): flujos de Playwright y corrección de desplazamiento a 390 px`.
 - **Pendiente:** paso 8.
+
+## 2026-11-06 16:00 · Paso 8 · CI
+
+- **Hecho:** `.github/workflows/ci.yml` con Node 22: `npm ci`, lint, TypeScript, Vitest, experimentos (una repetición, para comprobar los valores de referencia), build, Chromium y Playwright; si algo falla sube el reporte de Playwright. README con todos los comandos. No se ejecutó en GitHub.
+- **Decisiones:** el experimento se incluye en la CI porque termina con error si algún valor no coincide con la referencia; con una repetición tarda unos segundos.
+- **Problemas:** ninguno.
+- **Pruebas:** 97/97 Vitest, 4/4 E2E, lint ok, build ok, experimento sin fallas.
+- **Commit:** `ci: lint, pruebas, experimento, build y Playwright en GitHub Actions`.
+- **Pendiente:** que Luis agregue el remoto, haga push y revise la primera ejecución de la CI.

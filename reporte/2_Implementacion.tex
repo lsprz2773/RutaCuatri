@@ -1,0 +1,157 @@
+\chapter{Implementación}
+El sistema es una aplicación web en TypeScript con Next.js, exportada como sitio estático y sin servidor. El método de búsqueda está separado de la interfaz: vive en la carpeta \texttt{src/motor}, escrita en TypeScript puro, sin React ni ninguna dependencia de la interfaz. La interfaz nunca llama al motor directamente: le manda el problema a un Web Worker, que corre el motor y le devuelve eventos. La Tabla~\ref{TAB::Modulos} resume los módulos del motor; las pruebas y el script de experimentos importan los mismos archivos desde Node, sin navegador. El Anexo~\ref{ANX::Repositorio} describe el repositorio y cómo ejecutarlo.
+
+\begin{table}[H]
+  \begin{center}
+    \caption{Módulos del método de búsqueda (\texttt{src/motor})}
+    \label{TAB::Modulos}
+    \begin{tabular}{|| l | p{10cm} ||}
+        \hline
+        Archivo & Contenido \\ [0.5ex]
+        \hline\hline
+        \texttt{tipos.ts} & Tipos del contrato: \texttt{Problema}, \texttt{Sucesor}, \texttt{Resultado}, eventos \\
+        \hline
+        \texttt{problema.ts} & Máscaras de bits, materias necesarias y costo de un cuatrimestre \\
+        \hline
+        \texttt{validacion.ts} & Validación antes de buscar \\
+        \hline
+        \texttt{heuristica.ts} & Heurística $h(A)$ de la Ecuación~\eqref{EQ::Heuristica} \\
+        \hline
+        \texttt{sucesores.ts} & Generación de sucesores con las reglas de poda \\
+        \hline
+        \texttt{monticulo.ts} & Montículo binario propio para la frontera \\
+        \hline
+        \texttt{wastar.ts} & Una pasada de Weighted A*, A* y Costo Uniforme \\
+        \hline
+        \texttt{anytime.ts} & Anytime A*: las pasadas con pesos decrecientes \\
+        \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\section{Representación del estado}
+El conjunto $A$ de materias aprobadas se guarda como un entero sin signo de 32 bits, una materia por bit (por eso una malla admite hasta 31 materias). Unir conjuntos es un \emph{or} de bits y probar si una materia está aprobada es un \emph{and}. Para guardar estados en mapas y conjuntos se usa la clave numérica $A \cdot 3 + p$, que es exacta porque $3 \cdot 2^{32}$ es menor que $2^{53}$. Antes de buscar, la malla se compila a arreglos por índice: créditos, máscara de prerrequisitos de cada materia, máscara de materias ofrecidas en cada periodo y orden topológico.
+
+\section{Funciones del método de búsqueda}
+
+\subsection{Materias necesarias}
+La función del Código~\ref{COD::necesarias} calcula el cierre de la meta: las materias de $G$ que faltan más sus prerrequisitos pendientes.
+\begin{itemize}
+    \item \textbf{Recibe:} el problema \texttt{pb} y el conjunto aprobado \texttt{A} como máscara.
+    \item \textbf{Hace:} un recorrido en profundidad con pila desde $G \setminus A$, agregando los prerrequisitos que no están en $A$.
+    \item \textbf{Devuelve:} la máscara de materias necesarias.
+\end{itemize}
+\lstinputlisting[language=TypeScript, caption={Materias necesarias para la meta}, label={COD::necesarias}]{codigo/necesarias.ts}
+
+\subsection{Costo de un cuatrimestre}
+El Código~\ref{COD::costo} implementa $c(S)$ de la Ecuación~\eqref{EQ::CostoPlan}.
+\begin{itemize}
+    \item \textbf{Recibe:} el problema (por $\beta$ y $C_{norm}$) y los créditos del conjunto inscrito.
+    \item \textbf{Devuelve:} 1 más la penalización por los créditos arriba de la carga normal.
+\end{itemize}
+\lstinputlisting[language=TypeScript, caption={Costo de un cuatrimestre}, label={COD::costo}]{codigo/costoCuatrimestre.ts}
+
+\subsection{Validación}
+El Código~\ref{COD::validar} aplica las reglas de la validación antes de buscar. Primero revisa la malla (claves repetidas, prerrequisitos inexistentes, ciclos y el límite de 31 materias); si la malla tiene errores no sigue, porque las demás reglas dependen de ella. Después revisa los parámetros, el kárdex y las materias necesarias.
+\begin{itemize}
+    \item \textbf{Recibe:} el problema.
+    \item \textbf{Devuelve:} la lista de errores; vacía si el problema tiene plan.
+\end{itemize}
+\lstinputlisting[language=TypeScript, caption={Validación antes de buscar}, label={COD::validar}]{codigo/validar.ts}
+
+El Código~\ref{COD::validarNecesarias} es la parte que lleva a la pantalla ``Sin plan posible'': marca toda materia necesaria que no se abre en ningún periodo o que pesa más que $C_{max}$.
+\begin{itemize}
+    \item \textbf{Recibe:} el problema.
+    \item \textbf{Devuelve:} un error por cada materia necesaria sin oferta o con demasiados créditos, con la clave de la materia como causa.
+\end{itemize}
+\lstinputlisting[language=TypeScript, caption={Validación de las materias necesarias}, label={COD::validarNecesarias}]{codigo/validarNecesarias.ts}
+
+\subsection{Heurística}
+El Código~\ref{COD::heuristica} calcula $h(A)$. Recorre las materias necesarias en orden topológico: suma sus créditos para obtener $R$ y, para cada una, guarda la longitud de la cadena más larga que termina en ella ($1 +$ la mayor entre sus prerrequisitos necesarios), lo que da $L$. Guarda también la cadena misma, que la interfaz usa para explicar por qué el plan tiene $N$ cuatrimestres.
+\begin{itemize}
+    \item \textbf{Recibe:} el problema y el conjunto aprobado \texttt{A}.
+    \item \textbf{Devuelve:} un objeto con $h$, $R$, $L$ y la cadena; $h = 0$ cuando no falta ninguna materia.
+\end{itemize}
+\lstinputlisting[language=TypeScript, caption={Heurística $h(A) = \max(\lceil R / C_{max} \rceil, L)$}, label={COD::heuristica}]{codigo/detalleH.ts}
+
+\subsection{Sucesores}
+Los Códigos~\ref{COD::disponibles} y~\ref{COD::elegibles} calculan las materias que se pueden inscribir.
+\begin{itemize}
+    \item \textbf{Reciben:} el problema, el conjunto aprobado \texttt{A} y el periodo \texttt{p}.
+    \item \textbf{Hacen:} \texttt{disponibles} toma las materias no aprobadas que se abren en $p$ y tienen sus prerrequisitos en $A$; \texttt{elegibles} se queda con las que además son necesarias.
+    \item \textbf{Devuelven:} una máscara de materias.
+\end{itemize}
+\lstinputlisting[language=TypeScript, caption={Materias disponibles en un periodo}, label={COD::disponibles}]{codigo/disponibles.ts}
+\lstinputlisting[language=TypeScript, caption={Materias elegibles para la meta}, label={COD::elegibles}]{codigo/elegibles.ts}
+
+El Código~\ref{COD::sucesores} genera los sucesores en el orden descrito en la sección de transiciones del capítulo anterior. Primero agrega la materia exclusiva (la estadía) como conjunto de una sola materia. Después arma las combinaciones de tamaño 1 a $K$ en orden lexicográfico con una función recursiva que corta en cuanto los créditos pasan de $C_{max}$. Cada combinación completa pasa por la poda por dominancia en \texttt{emitir}. Al final agrega el cuatrimestre vacío solo si no quedó ningún conjunto. Con \texttt{reglas = false} desactiva las reglas de poda; se usa solo para el experimento C y las pruebas de propiedad.
+\begin{itemize}
+    \item \textbf{Recibe:} el problema, el estado \texttt{(A, p)} y la bandera \texttt{reglas}.
+    \item \textbf{Devuelve:} la lista de sucesores; cada uno con el nuevo conjunto aprobado, el siguiente periodo, el conjunto inscrito, sus créditos y su costo.
+\end{itemize}
+\lstinputlisting[language=TypeScript, caption={Generación de sucesores}, label={COD::sucesores}]{codigo/sucesores.ts}
+
+\subsection{Frontera}
+La frontera es un montículo binario propio (Código~\ref{COD::monticulo}) que recibe la función de comparación al construirse.
+\begin{itemize}
+    \item \textbf{\texttt{meter(x)}:} agrega un nodo y lo sube mientras sea menor que su padre; $O(\log n)$.
+    \item \textbf{\texttt{sacar()}:} devuelve el menor nodo, pone el último en la raíz y lo baja; $O(\log n)$. Devuelve \texttt{undefined} si está vacío.
+\end{itemize}
+\lstinputlisting[language=TypeScript, caption={Montículo binario de la frontera}, label={COD::monticulo}]{codigo/Monticulo.ts}
+
+El Código~\ref{COD::antes} es la comparación que usa la frontera. Recibe dos nodos y devuelve \texttt{true} si el primero va antes: menor $f$, luego más créditos aprobados, luego menor $g$ y luego el que entró primero.
+\lstinputlisting[language=TypeScript, caption={Desempate de la frontera}, label={COD::antes}]{codigo/antes.ts}
+
+\subsection{Una pasada de Weighted A*}
+El Código~\ref{COD::wastar} es el núcleo del método.
+\begin{itemize}
+    \item \textbf{Recibe:} el problema; el peso \texttt{H}; la \texttt{cota}, que es el mejor costo encontrado por pasadas anteriores (\texttt{Infinity} en la primera); el \texttt{limite} de expansiones y de tiempo, y las \texttt{opciones} (reglas de poda y uso de la heurística).
+    \item \textbf{Hace:} saca de la frontera el nodo de menor $f = g + H \cdot h$. Descarta los nodos ya cerrados o con un $g$ peor que el mejor conocido. Si el nodo cumple la meta termina (la meta se prueba al sacar, no al generar). Si no, lo cierra y genera sus sucesores; descarta todo sucesor cerrado o con $g + h \geq \text{cota}$, y mete los que mejoran el $g$ conocido de su estado, guardando su padre. Corta a las 200,000 expansiones o al llegar al tiempo límite.
+    \item \textbf{Devuelve:} un \texttt{Resultado} con el costo y el plan (o \texttt{null} si no encontró nada que mejore la cota), las expansiones, los nodos generados, el máximo de estados guardados, la causa del fin y el tiempo.
+\end{itemize}
+\lstinputlisting[language=TypeScript, caption={Una pasada de Weighted A*}, label={COD::wastar}]{codigo/wastar.ts}
+
+El Código~\ref{COD::reconstruir} recupera el plan. Recibe el problema, el mapa de padres y la clave del estado meta; sigue los padres hasta el inicio y devuelve la lista de cuatrimestres en orden, cada uno con su periodo, sus materias, sus créditos y su costo.
+\lstinputlisting[language=TypeScript, caption={Reconstrucción del plan}, label={COD::reconstruir}]{codigo/reconstruir.ts}
+
+Los métodos de comparación salen de la misma función (Códigos~\ref{COD::aestrella} y~\ref{COD::uniforme}): A* es una pasada con $H = 1$ y Costo Uniforme es una pasada con $h = 0$. Ambos reciben el problema y el límite, y devuelven el mismo \texttt{Resultado}.
+\lstinputlisting[language=TypeScript, caption={A* como una pasada con $H = 1$}, label={COD::aestrella}]{codigo/aEstrella.ts}
+\lstinputlisting[language=TypeScript, caption={Costo Uniforme como una pasada con $h = 0$}, label={COD::uniforme}]{codigo/costoUniforme.ts}
+
+\subsection{Anytime A*}
+El Código~\ref{COD::anytime} coordina las pasadas.
+\begin{itemize}
+    \item \textbf{Recibe:} el problema, la lista de pesos (por omisión 3, 2, 1.5 y 1), la función \texttt{alEvento} que recibe los eventos para la interfaz y las opciones de tiempo máximo y expansiones.
+    \item \textbf{Hace:} valida el problema; si hay errores emite el evento \texttt{error} y termina sin buscar. Después corre una pasada de Weighted A* por peso, pasándole como cota el mejor costo encontrado. Cuando una pasada mejora el plan, lo guarda junto con su peso, que es su garantía. Emite \texttt{pasada-inicio}, \texttt{plan}, \texttt{pasada-fin} y \texttt{fin}. Si la pasada con $H = 1$ termina (encuentra la meta o agota la frontera), marca el plan como óptimo. Si se acaba el tiempo, se queda con el mejor plan y la garantía de la pasada que lo produjo.
+    \item \textbf{Devuelve:} el costo y el plan, el resumen de cada pasada, si el plan es óptimo, la garantía, el tiempo total y el tiempo hasta el primer plan.
+\end{itemize}
+\lstinputlisting[language=TypeScript, caption={Anytime A*}, label={COD::anytime}]{codigo/anytime.ts}
+
+\section{Interfaz y escenarios configurables}
+La interfaz tiene diez pantallas y permite cambiar en cada ejecución el escenario, el estado inicial y la meta:
+\begin{itemize}
+    \item \textbf{Plan de estudios:} elegir una de las tres mallas, editar cualquier materia (créditos, prerrequisitos, oferta), agregar materias e importar o exportar CSV. Los errores de la validación se marcan en la fila y bloquean el paso siguiente.
+    \item \textbf{Historial:} marcar cada materia como aprobada, reprobada o pendiente, importar un kárdex en CSV y elegir el periodo de inscripción. Esto define $(A_0, p_0)$.
+    \item \textbf{Meta y parámetros:} elegir entre las cuatro metas, cambiar $C_{norm}$, $C_{max}$, $\beta$ y $K$, los pesos $H$ y el tiempo máximo (60 s, 5 min o sin límite).
+    \item \textbf{Búsqueda:} una tabla que se llena en vivo con cada pasada y el botón ``Detener y quedarme con el mejor plan'', que termina el Worker en menos de un segundo.
+\end{itemize}
+La pantalla de inicio (Figura~\ref{FIG::Inicio}) ofrece los 12 estudiantes de ejemplo y los planes guardados. Las demás pantallas aparecen en los casos del Capítulo~\ref{CAP::Resultados}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{inicio}
+    \caption{Pantalla de inicio con los planes guardados y los alumnos de ejemplo}
+    \label{FIG::Inicio}
+\end{figure}
+
+\section{Validación del motor}
+\label{SEC::Validacion}
+El motor se probó contra casos con respuesta conocida, calculados con una implementación de referencia independiente en Python:
+\begin{itemize}
+    \item \textbf{77 casos:} los 72 escenarios y 5 casos especiales (un ejemplo mínimo de 5 materias, una meta ya cumplida, una materia necesaria sin oferta, una materia más pesada que $C_{max}$ y un plan con un cuatrimestre vacío). El motor da el mismo costo (con tolerancia de $10^{-9}$) y el mismo número de cuatrimestres en los 77.
+    \item \textbf{Verificador independiente:} una función aparte, que trabaja con claves y no con máscaras ni con funciones del motor, revisa cada plan (prerrequisitos, oferta, $C_{max}$, $K$ y la estadía sola) y recalcula su costo.
+    \item \textbf{Garantía:} en cada pasada se comprueba $\text{costo} \leq H \cdot C^*$.
+    \item \textbf{Propiedades en 200 mallas al azar} de 8 a 11 materias: el costo con poda es igual al costo sin poda, $h$ nunca supera el costo real y $h(A) \leq c(S) + h(A \cup S)$ en cada transición.
+    \item \textbf{Flujos en el navegador} con Playwright: el plan de Ana Ruiz, el caso sin plan, Detener en menos de un segundo y la vista de celular sin desplazamiento horizontal.
+\end{itemize}
+En total son 97 pruebas unitarias y 4 de extremo a extremo, todas aprobadas.

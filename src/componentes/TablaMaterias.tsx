@@ -59,14 +59,14 @@ export function TablaMaterias({ materias, conError, alCambiar, alQuitar }: Props
   const numero = (v: string) => Math.max(1, Math.round(Number(v) || 1));
   return (
     <div className="relative overflow-x-auto">
-      <table className="w-full min-w-[52rem] border-collapse text-left text-sm">
+      <table className="w-full min-w-[58rem] border-collapse text-left text-sm">
         <thead>
           <tr className="text-gray-600">
             <th className={`${celda} w-24 font-normal`}>Clave</th>
-            <th className={`${celda} font-normal`}>Materia</th>
+            <th className={`${celda} min-w-52 font-normal`}>Materia</th>
             <th className={`${celda} w-20 font-normal`}>Créditos</th>
             <th className={`${celda} w-16 font-normal`}>Nivel</th>
-            <th className={`${celda} w-56 font-normal`}>Prerrequisitos</th>
+            <th className={`${celda} w-48 font-normal`}>Prerrequisitos</th>
             <th className={`${celda} w-44 font-normal`}>Se abre en</th>
             <th className={`${celda} w-20 font-normal`}>Exclusiva</th>
             <th className={`${celda} w-10 font-normal`}>

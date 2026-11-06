@@ -1,0 +1,22 @@
+\chapter{Conclusiones y recomendaciones}
+
+\section{Conclusiones}
+El proyecto cumplió su objetivo: dado un plan de estudios, un historial y una meta, RutaCuatri entrega el plan de inscripción de menor costo y demuestra que no existe uno mejor. En los 72 escenarios la pasada con $H = 1$ terminó y su costo coincidió con el de la implementación de referencia, y en todas las pasadas se cumplió la garantía $\text{costo} \leq H \cdot C^*$.
+
+\textbf{Qué se aprendió.} La parte decisiva no fue el algoritmo de búsqueda sino el modelo. Representar el estado como (materias aprobadas, periodo) hizo que el problema cupiera en un entero de 32 bits; restringir los sucesores a las materias necesarias y descartar los conjuntos dominados redujo las expansiones hasta 19 veces sin perder el óptimo (Tabla~\ref{TAB::ExpC}), y una heurística consistente permitió cerrar los estados sin reabrirlos. También se aprendió a comprobar un buscador: compararlo con una implementación de referencia independiente, revisar cada plan con un verificador aparte y probar propiedades en mallas al azar da una confianza que un solo caso de ejemplo no da. Las pruebas en el navegador, por su parte, encontraron un error de la vista de celular que en escritorio no se veía.
+
+Sobre el método, Anytime A* se comportó como se esperaba: en el Caso 2 dio un primer plan a 18\% del óptimo con menos del 1\% de las expansiones de A*, y en 52 de los 72 escenarios la primera pasada ya era óptima. El costo de esa ventaja es repetir la búsqueda: en total expandió 30\% más nodos que A* (Tabla~\ref{TAB::ExpB}). Con mallas de 28 materias todo termina en milisegundos, así que la ventaja práctica de Anytime crece con mallas más grandes o con cargas que obligan a negociar entre sobrecarga y cuatrimestres.
+
+Para el estudiante, el experimento D deja una conclusión útil: la carga normal es lo que más decide cuándo egresa, mientras que subir la carga máxima arriba de 33 créditos no adelanta nada, porque lo que manda es la cadena de seriación.
+
+\textbf{Qué se haría diferente.} Se definirían desde el principio los casos de prueba con respuesta conocida, antes de escribir el motor: fueron la herramienta que más ahorró tiempo. También se diseñaría la heurística con un tercer término, por ejemplo la espera mínima hasta el siguiente periodo en que se abre la primera materia de la cadena crítica, porque en varios escenarios la cota inicial queda un cuatrimestre por debajo del óptimo por la oferta, y una cota más ajustada reduciría la última pasada.
+
+\textbf{Nuevos proyectos.} El mismo modelo sirve para planear con varios escenarios de oferta (por ejemplo, la probabilidad de que un grupo se abra), lo que lo convertiría en un problema no determinista; para recomendar a la coordinación qué materias abrir en cada periodo según los planes de todos los estudiantes irregulares, y para combinarlo con un generador de horarios que reciba las materias de cada cuatrimestre.
+
+\section{Recomendaciones}
+\begin{itemize}
+    \item \textbf{Mallas más grandes.} El estado como entero de 32 bits limita la malla a 31 materias. Para una carrera completa de 60 materias habría que pasar a dos enteros o a \texttt{BigInt}, y medir de nuevo el tiempo, porque ahí la ventaja de Anytime A* frente a A* sería mayor.
+    \item \textbf{Reutilizar la frontera entre pasadas.} Cada pasada empieza desde cero. Una variante tipo ARA* \cite{likhachev2003}, que reutiliza la frontera y reabre estados, ahorraría expansiones en mallas grandes, a cambio de un código más difícil de probar.
+    \item \textbf{Datos oficiales.} Las mallas son de diseño propio. Integrar los planes y la oferta oficiales de la universidad, por ejemplo con un importador desde el sistema escolar, haría que el sistema se pudiera usar en la tutoría real.
+    \item \textbf{Materias reprobadas con probabilidad.} Hoy una materia reprobada se modela volviendo a planear. Un modelo que considere la probabilidad de reprobar podría preferir planes con margen.
+\end{itemize}

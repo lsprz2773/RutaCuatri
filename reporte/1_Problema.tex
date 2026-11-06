@@ -1,0 +1,273 @@
+\chapter{RutaCuatri}
+\section{Planteamiento del problema}
+En un sistema cuatrimestral el año escolar tiene tres periodos de inscripción: enero, mayo y septiembre. Un estudiante regular sigue la malla en el orden en que fue diseñada, pero un estudiante irregular, que reprobó una materia o lleva materias atrasadas, tiene que decidir por su cuenta qué inscribir en cada cuatrimestre. Esa decisión responde dos preguntas: cuántos cuatrimestres le faltan para terminar y qué materias le conviene llevar en cada uno para no atrasarse más.
+
+La decisión se complica porque tres reglas chocan entre sí:
+\begin{itemize}
+    \item \textbf{Seriación.} Una materia solo se puede inscribir cuando todos sus prerrequisitos están aprobados; por ejemplo, Cálculo integral requiere Cálculo diferencial, y Métodos numéricos requiere Cálculo integral.
+    \item \textbf{Oferta por periodo.} No todas las materias se abren en los tres periodos. Las de los niveles 3 a 5 se abren en dos periodos y las optativas en uno solo, así que posponer una materia puede costar hasta un año.
+    \item \textbf{Carga.} Cada cuatrimestre tiene una carga máxima de créditos $C_{max}$ que no se puede pasar, y cargar más que la carga normal $C_{norm}$ tiene una penalización.
+\end{itemize}
+
+A mano, el estudiante prueba combinaciones en una hoja hasta que algo cuadra, sin saber nunca si existía una opción mejor. El objetivo del proyecto es construir un agente que, dado un plan de estudios, el historial de un estudiante y una meta, encuentre el plan de inscripción de menor costo y demuestre que no existe uno mejor. El costo de un plan es el número de cuatrimestres más una penalización $\beta$ por cada crédito inscrito arriba de la carga normal.
+
+El problema no se resuelve con una regla fija como ``inscribe todo lo que puedas''. Con 8 materias disponibles hay más de 200 formas de inscribir un solo cuatrimestre, y la decisión se repite en cada cuatrimestre. Inscribir de más adelanta materias pero cuesta penalización; posponer una materia que encabeza una cadena larga de prerrequisitos alarga toda la carrera. Por eso se plantea como un problema de búsqueda en el espacio de conjuntos de materias aprobadas, y se resuelve con Anytime A* \cite{hansen2007}, que entrega un primer plan casi de inmediato y lo mejora hasta demostrar el óptimo.
+
+\subsection{Escenarios}
+Para que el estado inicial, la meta y el escenario cambien en cada ejecución, el sistema incluye tres planes de estudio de diseño propio con 28 materias cada uno: Ingeniería en Desarrollo de Software (ISW), Ingeniería en Redes y Ciberseguridad (IRC) e Ingeniería en Ciencia de Datos (ICD). Las tres siguen las reglas de la Tabla~\ref{TAB::Mallas}. Los planes de estudio oficiales no publican la oferta por periodo, que es el dato que el modelo necesita; por eso se diseñaron mallas propias con la misma estructura, editables desde la interfaz e importables en CSV.
+
+\begin{table}[H]
+  \begin{center}
+    \caption{Reglas comunes a las tres mallas}
+    \label{TAB::Mallas}
+    \begin{tabular}{|| p{3.5cm} | p{10cm} ||}
+        \hline
+        Elemento & Regla \\ [0.5ex]
+        \hline\hline
+        Niveles 1 a 3 & 5 materias obligatorias por nivel \\
+        \hline
+        Niveles 4 y 5 & 4 obligatorias y un espacio de optativa por nivel \\
+        \hline
+        Especialidades & A y B, cada una con una optativa en el nivel 4 y otra en el nivel 5 que la tiene de prerrequisito \\
+        \hline
+        Estadía & 30 créditos, se cursa sola y requiere las 23 obligatorias \\
+        \hline
+        Créditos & De 4 a 8 horas de clase por semana \\
+        \hline
+        Oferta & Niveles 1 y 2: Ene, May y Sep. Niveles 3 a 5: su periodo y el siguiente. Optativas: solo su periodo. Inglés y Estadía: los tres \\
+        \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+Cada malla trae cuatro estudiantes tipo (Tabla~\ref{TAB::Alumnos}) y tres metas: titulación con especialidad A (M1, 26 materias), llegar a la estadía (M2, las 23 obligatorias) y especialidad B (M3, sus 2 optativas y los prerrequisitos que falten). Además hay dos perfiles de carga (Tabla~\ref{TAB::Perfiles}). En total son $3 \times 4 \times 3 \times 2 = 72$ escenarios, y todos tienen un costo óptimo conocido que sirve para probar el motor (Sección~\ref{SEC::Validacion}).
+
+\begin{table}[H]
+  \begin{center}
+    \caption{Estudiantes tipo, iguales en las tres mallas}
+    \label{TAB::Alumnos}
+    \begin{tabular}{|| l | p{6.5cm} | l ||}
+        \hline
+        Estudiante & Materias aprobadas & Inscribe en \\ [0.5ex]
+        \hline\hline
+        E1, nuevo ingreso & Ninguna & Sep \\
+        \hline
+        E2, Daniel Ortega, regular & 01 a 10 (niveles 1 y 2) & May \\
+        \hline
+        E3, Ana Ruiz, reprobó Cálculo diferencial & 02, 03, 04, 05, 07, 08 y 09 & May \\
+        \hline
+        E4, Marco Silva, reprobó la materia 11 & 01 a 15 excepto la 11 & Sep \\
+        \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \caption{Perfiles de carga por omisión}
+    \label{TAB::Perfiles}
+    \begin{tabular}{|| l | c | c | c | c ||}
+        \hline
+        Perfil & $C_{norm}$ & $C_{max}$ & $\beta$ & $K$ \\ [0.5ex]
+        \hline\hline
+        Regular & 30 & 36 & 0.1 & 7 \\
+        \hline
+        Medio tiempo & 24 & 30 & 0.1 & 7 \\
+        \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+El crédito es una hora de clase por semana, así que cada nivel suma entre 29 y 32 créditos y cabe en la carga normal del perfil regular. $K$ es el máximo de materias por cuatrimestre. El perfil de medio tiempo es el que obliga a la búsqueda a negociar entre sobrecarga y cuatrimestres, porque el estudiante ya no cabe en un nivel por cuatrimestre.
+
+El alcance tiene dos supuestos. Primero, el estudiante aprueba lo que inscribe; si reprueba, se actualiza el historial y se vuelve a planear desde ahí. Segundo, el sistema decide qué materias llevar en cada cuatrimestre, no arma horarios, grupos ni salones.
+
+\section{PEAS}
+El marco PEAS describe a un agente por su medida de desempeño, su entorno, sus actuadores y sus sensores \cite{russell2021}. En RutaCuatri el agente es el planificador: recibe la malla, el historial y la meta, y produce el plan de inscripción.
+
+\subsection{Medida de desempeño}
+La medida principal es el costo del plan, que el agente minimiza:
+\begin{equation}
+    \label{EQ::CostoPlan}
+    C(\text{plan}) = \sum_{t=1}^{T} c(S_t), \qquad c(S) = 1 + \beta \cdot \max\left(0,\ \textstyle\sum_{m \in S} \mathrm{cr}(m) - C_{norm}\right)
+\end{equation}
+donde $T$ es el número de cuatrimestres del plan y $S_t$ el conjunto inscrito en el cuatrimestre $t$. La Ecuación~\eqref{EQ::CostoPlan} mide lo que le importa al estudiante: cada cuatrimestre cuesta 1 y cada crédito arriba de la carga normal cuesta $\beta$. Con $\beta = 0.1$, seis créditos extra cuestan 0.6, menos que un cuatrimestre más pero no gratis. Un plan solo es válido si cumple seriación, oferta, carga máxima y la estadía sola.
+
+Como criterios secundarios se miden el tiempo hasta el primer plan, la calidad de cada plan intermedio (su costo frente a la cota $H \cdot C^*$) y los nodos expandidos. Se justifican porque el propósito de Anytime A* es responder rápido y mejorar con el tiempo: un estudiante necesita una respuesta de inmediato aunque al principio sea un poco peor.
+
+\subsection{Entorno}
+El entorno es el plan de estudios: materias con créditos, nivel, prerrequisitos, periodos en que se abren y si son exclusivas (la estadía), más tres periodos por año y los parámetros de carga $C_{norm}$, $C_{max}$, $\beta$ y $K$. Todo se carga antes de planear y no cambia durante la búsqueda.
+
+\subsubsection{Características del entorno}
+La Tabla~\ref{TAB::Entorno} justifica cada característica en términos del problema.
+\begin{table}[H]
+  \begin{center}
+    \caption{Caracterización del entorno}
+    \label{TAB::Entorno}
+     \begin{tabular}{|| l | p{9.5cm} ||}
+        \hline
+        Característica & Justificación\\ [0.5ex]
+        \hline\hline
+        Determinista & Supuesto de planificación: lo que se inscribe se aprueba, así que cada inscripción lleva a un único estado. Una materia reprobada se modela como otro estado inicial en otra ejecución. \\
+        \hline
+        Monoagente & Solo el planificador decide qué se inscribe en cada cuatrimestre. \\
+        \hline
+        Completamente observable & El historial, la malla y la oferta se conocen completos antes de planear. \\
+        \hline
+        Secuencial & Lo que se aprueba en un cuatrimestre habilita o bloquea las materias de los siguientes. \\
+        \hline
+        Discreto & Materias, créditos y cuatrimestres son valores enteros finitos. \\
+        \hline
+        Estático & La malla, la oferta y los límites de carga no cambian mientras se busca; un cambio en el mundo real es otro escenario. \\
+        \hline
+        Conocido & Se conocen las reglas de seriación, oferta y carga, y el costo de cada acción. \\
+        \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsection{Actuadores}
+El agente tiene una sola acción: inscribir un conjunto $S$ de materias disponibles en el cuatrimestre actual y avanzar al siguiente periodo. $S$ puede estar vacío cuando en ese periodo no se abre ninguna materia necesaria; el plan espera un cuatrimestre, que cuesta 1. La estadía se inscribe sola. Al terminar, el agente reporta el plan por cuatrimestre con sus créditos y su costo, o la causa por la que no hay plan.
+
+\subsection{Sensores}
+El agente percibe el historial del estudiante (materias aprobadas, reprobadas y pendientes), el periodo en que inscribe, el grafo de prerrequisitos, la oferta de cada materia por periodo, los créditos de cada materia, los parámetros de carga y la meta elegida. Con eso basta, porque el entorno es completamente observable: no hay información oculta que el agente tenga que estimar.
+
+\section{Especificación del problema de búsqueda}
+El problema se especifica con los siguientes elementos:
+\begin{itemize}
+    \item \textbf{Estado:} el par $(A, p)$, donde $A$ es el conjunto de materias aprobadas y $p \in \{\text{Ene}, \text{May}, \text{Sep}\}$ el periodo en que se inscribe.
+    \item \textbf{Estado inicial:} $(A_0, p_0)$, el historial del estudiante y su siguiente periodo.
+    \item \textbf{Meta:} cualquier estado con $A \supseteq G$, donde $G$ es el conjunto de materias que se quiere terminar.
+    \item \textbf{Acciones:} inscribir un conjunto $S$ de materias elegibles con $\mathrm{cr}(S) \leq C_{max}$ y $|S| \leq K$.
+    \item \textbf{Transición:} $(A, p) \vdash (A \cup S,\ (p + 1) \bmod 3)$.
+    \item \textbf{Costo:} $c(S)$ de la Ecuación~\eqref{EQ::CostoPlan}; $g(n)$ es la suma de estos costos desde el inicio.
+\end{itemize}
+
+Se llaman \emph{materias necesarias} las de $G$ que faltan más todos sus prerrequisitos pendientes, es decir, el cierre de $G \setminus A$ bajo la relación de prerrequisito. Solo las materias necesarias entran en la búsqueda, porque inscribir una materia que la meta no usa nunca baja el costo.
+
+Antes de buscar se valida el problema. Si toda clave de prerrequisito existe y no hay ciclos, toda materia necesaria se abre en algún periodo y cabe en $C_{max}$, el kárdex es coherente y los parámetros cumplen $K \geq 1$, $C_{norm} \leq C_{max}$ y $\beta \geq 0$, entonces siempre existe un plan: basta tomar las materias necesarias de una en una en orden de prerrequisitos y esperar con cuatrimestres vacíos a que cada una se abra. Por eso la búsqueda nunca termina sin plan y el caso ``sin plan'' sale solo de la validación.
+
+\section{Estado inicial}
+El estado inicial lo elige el usuario en cada ejecución. Tres ejemplos de la malla ISW:
+\begin{enumerate}
+    \item \textbf{Nuevo ingreso (ISW-E1):} $(\emptyset, \text{Sep})$. No tiene materias aprobadas y entra en septiembre, que es cuando la malla abre el primer nivel. Las cinco materias del nivel 1 están disponibles.
+    \item \textbf{Ana Ruiz (ISW-E3):} $(\{\text{ISW02}, \text{ISW03}, \text{ISW04}, \text{ISW05}, \text{ISW07}, \text{ISW08}, \text{ISW09}\}, \text{May})$. Aprobó siete materias de los niveles 1 y 2 pero reprobó Cálculo diferencial (ISW01). En mayo puede llevar ISW01, ISW11, ISW13, ISW14 e ISW15. Cálculo diferencial encabeza la cadena ISW01 $\to$ ISW06 $\to$ ISW12 $\to$ ISW28, así que su materia reprobada marca el ritmo del plan.
+    \item \textbf{Marco Silva (ISW-E4):} aprobó de la ISW01 a la ISW15 excepto Estructuras de datos (ISW11) e inscribe en septiembre. ISW11 abre Sistemas operativos y de ahí Seguridad informática, así que también encabeza una cadena de cuatro materias hasta la estadía.
+\end{enumerate}
+
+\section{Meta}
+La meta es un conjunto $G$ de materias; un estado es meta cuando $A \supseteq G$. La interfaz ofrece cuatro tipos y se presentan tres ejemplos:
+\begin{enumerate}
+    \item \textbf{Toda la malla con especialidad A (M1):} las 23 obligatorias, las 2 optativas de la especialidad A y la estadía; 26 materias. Para el nuevo ingreso las 26 son necesarias.
+    \item \textbf{Llegar a la estadía (M2):} solo las 23 obligatorias. Es la meta de quien quiere saber cuándo puede empezar la estadía.
+    \item \textbf{Especialidad B (M3):} solo las dos optativas B (en ISW, Análisis de datos y Aprendizaje automático). Aunque $G$ tiene 2 materias, las necesarias incluyen sus prerrequisitos pendientes: para el nuevo ingreso son 8 materias (las 2 optativas, ISW01, ISW03, ISW06, ISW08, ISW10 e ISW12) en 5 cuatrimestres.
+\end{enumerate}
+El cuarto tipo, materias específicas, deja al usuario elegir $G$ materia por materia.
+
+\section{Espacio de estados}
+Un estado combina un subconjunto de las $N$ materias con uno de los 3 periodos:
+\begin{equation}
+    \label{EQ::Espacio}
+    |\mathcal{S}| \leq 3 \cdot 2^{N}, \qquad 3 \cdot 2^{28} = 3 \cdot 268{,}435{,}456 = 805{,}306{,}368
+\end{equation}
+La Ecuación~\eqref{EQ::Espacio} da el tamaño teórico para las mallas de 28 materias. El espacio alcanzable es mucho menor, porque la seriación y la oferta descartan la mayoría de los conjuntos: un conjunto $A$ que contiene una materia sin su prerrequisito nunca se alcanza. Aun así, el número de caminos crece muy rápido. Desde el estado inicial de Ana hay 32 formas válidas de inscribir el primer cuatrimestre.
+
+Los estados más importantes son:
+\begin{itemize}
+    \item \textbf{Inicial:} $(A_0, p_0)$, por ejemplo $(\emptyset, \text{Sep})$ del nuevo ingreso.
+    \item \textbf{Intermedio típico:} después del primer cuatrimestre del nuevo ingreso en perfil regular, $(\{\text{ISW01}, \ldots, \text{ISW05}\}, \text{Ene})$: el nivel 1 completo con 29 créditos y costo 1.
+    \item \textbf{Estado de espera:} $(A, \text{May})$ con las 23 obligatorias aprobadas y solo la estadía o una optativa de un solo periodo pendientes; si nada necesario se abre en mayo, la única transición es el cuatrimestre vacío.
+    \item \textbf{Meta:} cualquier $(A, p)$ con $A \supseteq G$; el periodo no importa.
+\end{itemize}
+
+\section{Transiciones}
+Desde un estado $(A, p)$ los sucesores se generan con cinco reglas:
+\begin{enumerate}
+    \item \textbf{Elegibles.} Materias no aprobadas, necesarias para la meta, que se abren en $p$ y tienen todos sus prerrequisitos en $A$.
+    \item \textbf{Conjuntos.} Subconjuntos $S$ de 1 a $K$ elegibles con $\mathrm{cr}(S) \leq C_{max}$. La estadía solo forma el conjunto $\{\text{Estadía}\}$.
+    \item \textbf{Poda por dominancia.} Se descarta $S$ si $\mathrm{cr}(S) \leq C_{norm}$, $|S| < K$ y queda otra elegible $x$, fuera de $S$ y no exclusiva, con $\mathrm{cr}(S) + \mathrm{cr}(x) \leq C_{norm}$. Agregar $x$ no cambia el costo del cuatrimestre y lleva a un estado con más materias aprobadas, así que $S$ nunca es mejor que $S \cup \{x\}$.
+    \item \textbf{Cuatrimestre vacío.} $S = \emptyset$, de costo 1, solo se genera si no quedó ningún conjunto.
+    \item \textbf{Resultado.} Cada $S$ produce $(A \cup S, (p+1) \bmod 3)$ con costo $c(S)$.
+\end{enumerate}
+
+\textbf{Orden en que se analizan las ramas.} Los sucesores se generan en este orden: primero la materia exclusiva, si es elegible; después los conjuntos por tamaño creciente y, dentro de cada tamaño, en orden lexicográfico de la clave de las materias. La enumeración corta una rama en cuanto los créditos pasan de $C_{max}$. Después, la frontera decide qué estado se expande: el de menor $f = g + H \cdot h$; si hay empate, el que tiene más créditos aprobados (el que adelanta más); luego el de menor $g$, y al final el que entró primero. Así el resultado es siempre el mismo.
+
+La Tabla~\ref{TAB::Transiciones} lista los tipos de transición.
+
+\begin{table}[H]
+  \begin{center}
+    \caption{Tipos de transición desde $(A, p)$}
+    \label{TAB::Transiciones}
+    \begin{tabular}{|| p{3.3cm} | p{5cm} | p{2.4cm} | p{3cm} ||}
+        \hline
+        Transición & Resultado & Costo & Condición \\ [0.5ex]
+        \hline\hline
+        Inscribir $S$ & $(A \cup S, p + 1)$ & $1 + \beta \max(0, \mathrm{cr}(S) - C_{norm})$ & $S$ elegible, $\mathrm{cr}(S) \leq C_{max}$, $|S| \leq K$ \\
+        \hline
+        Inscribir la estadía & $(A \cup \{\text{Estadía}\}, p + 1)$ & 1 (30 créditos) & Las 23 obligatorias aprobadas \\
+        \hline
+        Cuatrimestre vacío & $(A, p + 1)$ & 1 & No queda ningún conjunto \\
+        \hline
+        Conjunto dominado & Se descarta & --- & Le cabe otra materia sin pasar de $C_{norm}$ \\
+        \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+Como las transiciones son demasiadas para listarlas, la Tabla~\ref{TAB::TransicionesAna} muestra las del primer cuatrimestre de Ana en el perfil regular. Hay cinco elegibles (31 créditos) y, de los 32 conjuntos válidos, la poda deja 6. La columna de costo total suma el costo de esa elección y el óptimo calculado con A* desde el estado que deja.
+
+\begin{table}[H]
+  \begin{center}
+    \caption{Sucesores de $(A_0, \text{May})$ de Ana Ruiz, perfil regular}
+    \label{TAB::TransicionesAna}
+    \begin{tabular}{|| l | c | c | c ||}
+        \hline
+        Conjunto $S$ & Créditos & $c(S)$ & Costo total \\ [0.5ex]
+        \hline\hline
+        ISW01, ISW11, ISW13, ISW14 (elegido) & 26 & 1.0 & 5.0 \\
+        \hline
+        ISW01, ISW11, ISW14, ISW15 & 26 & 1.0 & 5.0 \\
+        \hline
+        ISW11, ISW13, ISW14, ISW15 & 25 & 1.0 & 5.0 \\
+        \hline
+        ISW01, ISW11, ISW13, ISW14, ISW15 & 31 & 1.1 & 5.1 \\
+        \hline
+        ISW01, ISW13, ISW14, ISW15 & 23 & 1.0 & 5.1 \\
+        \hline
+        ISW01, ISW11, ISW13, ISW15 & 24 & 1.0 & 7.0 \\
+        \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+Tres conjuntos empatan en 5.0. El desempate por avance elige el de más créditos, y entre los dos de 26 créditos gana el que entró primero.
+
+\section{Métricas de rendimiento}
+Se eligieron las siguientes métricas:
+\begin{enumerate}
+    \item \textbf{Costo del plan} (Ecuación~\eqref{EQ::CostoPlan}), desglosado por cuatrimestre. Es lo que el agente minimiza y lo que le importa al estudiante.
+    \item \textbf{Número de cuatrimestres y créditos de sobrecarga.} Separan las dos partes del costo y permiten ver si el plan alarga la carrera o carga de más.
+    \item \textbf{Tiempo hasta el primer plan y tiempo total.} Miden la ventaja que se espera de Anytime A*: responder pronto y terminar después.
+    \item \textbf{Calidad de cada pasada.} El costo de cada pasada con peso $H$ debe cumplir $\text{costo} \leq H \cdot C^*$; se comprueba en todos los escenarios.
+    \item \textbf{Nodos expandidos, nodos generados y máximo de estados en memoria.} Miden el esfuerzo de la búsqueda y permiten comparar métodos y reglas de poda.
+    \item \textbf{Optimalidad.} La última pasada debe dar el mismo costo que A* y que Costo Uniforme; Weighted A* con $H = 2$ sirve de comparación de un método rápido sin mejora.
+\end{enumerate}
+
+\section{Heurísticas}
+\label{SEC::Heuristica}
+La heurística estima cuántos cuatrimestres faltan como mínimo:
+\begin{equation}
+    \label{EQ::Heuristica}
+    h(A) = \max\left(\left\lceil \frac{R}{C_{max}} \right\rceil,\ L\right)
+\end{equation}
+donde $R$ es la suma de créditos de las materias necesarias que faltan y $L$ es el número de materias de la cadena de prerrequisitos más larga entre ellas.
+
+\textbf{Justificación.} La Ecuación~\eqref{EQ::Heuristica} es admisible por dos razones independientes. En un cuatrimestre se aprueban como mucho $C_{max}$ créditos, así que faltan al menos $\lceil R / C_{max} \rceil$ cuatrimestres. Y una cadena de $L$ materias exige $L$ cuatrimestres distintos, porque una materia y su prerrequisito no pueden ir en el mismo conjunto. Como cada cuatrimestre cuesta al menos 1, $h$ nunca supera el costo real. También es consistente: después de una transición $R$ baja como mucho $C_{max}$ y $L$ baja como mucho 1, así que $h$ baja como mucho 1 y se cumple $h(A) \leq c(S) + h(A \cup S)$. La consistencia permite cerrar los estados sin reabrirlos y garantiza que la pasada con $H = 1$ encuentre el óptimo \cite{hart1968}.
+
+\textbf{Ejemplo.} Para Ana con la meta M1 faltan 19 materias necesarias con $R = 140$ créditos, y la cadena más larga es ISW01 $\to$ ISW06 $\to$ ISW12 $\to$ ISW28 ($L = 4$). Con $C_{max} = 36$:
+\[
+h(A_0) = \max(\lceil 140/36 \rceil, 4) = \max(4, 4) = 4.
+\]
+El óptimo de Ana es 5, así que la cota inicial queda a un cuatrimestre del costo real.
+
+\textbf{Uso en Anytime A*.} Cada pasada es un Weighted A* \cite{pohl1970} que ordena la frontera por $f(n) = g(n) + H \cdot h(n)$ con $H = 3, 2, 1.5$ y $1$. Con $H$ alto la búsqueda corre hacia la meta; cada pasada siguiente descarta todo sucesor con $g + h \geq$ mejor costo encontrado. El plan de una pasada con peso $H$ cuesta como mucho $H \cdot C^*$, y la pasada con $H = 1$ es A* con heurística consistente: si encuentra un plan es óptimo, y si agota la frontera, el mejor plan anterior era el óptimo. A diferencia de ARA* \cite{likhachev2003}, cada pasada empieza desde cero: es más fácil de probar y, con la poda por el mejor costo, cada pasada nueva es corta.

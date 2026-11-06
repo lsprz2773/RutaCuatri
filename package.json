@@ -12,7 +12,9 @@
     "test": "vitest run",
     "experimento": "node scripts/experimento.ts",
     "e2e": "playwright test",
-    "servir": "node scripts/servir.ts"
+    "servir": "node scripts/servir.ts",
+    "capturas": "node scripts/capturas.ts",
+    "codigo-reporte": "node scripts/codigo-reporte.ts"
   },
   "dependencies": {
     "next": "16.4.4",

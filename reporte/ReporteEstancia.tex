@@ -1,0 +1,102 @@
+\documentclass[letterpaper,12pt,oneside]{report}
+\usepackage[english, spanish, es-tabla,top=1in, left=1.25in, right=1.25in, bottom=1in]{geometry}
+\usepackage{UPChiapas_Estadia_Template}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage[OT1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-nodecimaldot,es-tabla]{babel}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{setspace}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{babel}
+
+\author{243757 PÉREZ AGUILERA LUIS ANGEL\\243472 SELVAS DE LEÓN LUIS ANTONIO}
+\ingenieria{Ingeniería en Tecnologías de la Información e Innovación Digital}
+\title{RutaCuatri: planificación de la trayectoria académica de un estudiante irregular por cuatrimestres mediante Anytime A*}
+\AsesorAcademico{Carlos Alberto Díaz Hernández}
+\ciudadyfecha{Suchiapa, Chiapas, septiembre - diciembre de 2026}
+\logouni{logo}
+\logofac{}
+
+\graphicspath{{./imagenes/}}
+
+% La clase report no define estas divisiones; se declaran vacías para que el documento compile.
+\providecommand{\frontmatter}{}
+\providecommand{\mainmatter}{}
+\providecommand{\backmatter}{}
+
+\begin{document}
+\frontmatter
+\maketitle
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% TypeScript no viene en listings; se define con las palabras clave que usa el motor.
+\lstdefinelanguage{TypeScript}{
+    keywords={function, return, const, let, for, of, if, else, while, new, class, export, import, from, type, interface, private, readonly, true, false, null, undefined, continue, break, constructor, this, void},
+    keywordstyle=\color{magenta}\bfseries,
+    ndkeywords={number, string, boolean, Problema, Periodo, Sucesor, Resultado, Limite, OpcionesBusqueda, Cuatrimestre, Nodo, Padre, EventoMotor, ResultadoAnytime, ResumenPasada, ErrorValidacion, Map, Set, Infinity},
+    ndkeywordstyle=\color{blue},
+    sensitive=true,
+    comment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]",
+    morestring=[b]`,
+}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    extendedchars=true,
+    literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1
+             {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1 {Ñ}{{\~N}}1
+             {∪}{{$\cup$}}1 {≥}{{$\geq$}}1 {≤}{{$\leq$}}1 {·}{{$\cdot$}}1 {→}{{$\to$}}1
+}
+\lstset{style=mystyle}
+\renewcommand{\lstlistingname}{Código}
+\renewcommand{\lstlistlistingname}{Índice de bloques de código}
+%\input{0A_Dedicatoria}
+%\input{0B_Agradecimientos}
+\input{0C_Resumen}
+\input{0D_Abstract}
+
+\tableofcontents
+\listoffigures
+\lstlistoflistings
+\listoftables
+
+\mainmatter
+\input{1_Problema}\clearpage
+\input{2_Implementacion}\clearpage
+\input{3_Resultados}\clearpage
+\input{4_Conclusiones}\clearpage
+\input{5_Anexos}\clearpage
+
+
+\bibliographystyle{plain}
+\bibliography{referencias.bib}
+\backmatter
+\end{document}

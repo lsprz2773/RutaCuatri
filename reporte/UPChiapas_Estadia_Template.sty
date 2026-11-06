@@ -1,0 +1,85 @@
+\ProvidesPackage{UPChiapas_Estadia_Template}[20260708]
+\RequirePackage{graphicx}
+\renewcommand*\familydefault{\sfdefault}
+
+\@ifpackageloaded{geometry}{}{\RequirePackage[pass]{geometry}}
+\newcommand*{\ingenieria}[1]{\gdef\@ingenieria{#1}}
+\newcommand*{\@ingenieria}{\texttt{\string\ingenieria} No se ha indicado la ingeniería.}
+\newcommand*{\AsesorLaboral}[1]{\gdef\@AsesorLaboral{#1}}
+\newcommand*{\AsesorAcademico}[1]{\gdef\@AsesorAcademico{#1}}
+\newcommand*{\RevisorAcademico}[1]{\gdef\@RevisorAcademico{#1}}
+\newcommand*{\@AsesorLaboral}{\texttt{\string\AsesorLaboral} No se ha indicado el asesor laboral.}
+\newcommand*{\@RevisorAcademico}{\texttt{\string\RevisorAcademico} No se ha indicado el revisor académico.}
+\newcommand*{\ciudadyfecha}[1]{\gdef\@ciudadyfecha{#1}}
+\newcommand*{\@ciudadyfecha}{\texttt{\string\ciudadyfecha} Ciudad y año aún no indicados. Debe completar esta información.}
+\newcommand*{\logouni}[1]{\gdef\@logouni{#1}}
+\newcommand*{\@logouni}{example-image-a}
+\newcommand*{\logofac}[1]{\gdef\@logofac{#1}}
+\newcommand*{\@logofac}{example-image-b}
+
+\renewcommand*{\maketitle}{%
+\begin{titlepage}
+    \newgeometry{left=3cm, right=3cm, bottom=2.5cm, top=2cm}
+    \noindent
+    \begin{minipage}[c][0.99\textheight][c]{0.2\textwidth}%
+	    \noindent
+	    \begin{minipage}[t][0.15\textheight][c]{\textwidth}
+		    \begin{center}	
+		        \includegraphics[height=2.718cm]{\@logouni}
+		    \end{center}
+	    \end{minipage}%
+	    \\
+	    \noindent
+	    \begin{minipage}[c][.7\textheight][c]{\textwidth}
+                \vspace{2.9cm} % Ajusta el valor para mover hacia abajo
+		    \begin{center}
+		        \vrule width1pt height0.77\textheight
+		        \hskip3mm
+		        \vrule width2pt height0.77\textheight
+		        \hskip3mm
+		        \vrule width1pt height0.77\textheight
+		    \end{center}
+	    \end{minipage}%
+	    \\
+	    \noindent
+	    \begin{minipage}[b][0.15\textheight][c]{\textwidth}
+		    \begin{center}	
+		        %\includegraphics[height=2.718cm]{\@logofac}
+		    \end{center}
+	    \end{minipage}%
+    \end{minipage}
+    \hfill%
+    \begin{minipage}[c][0.99\textheight][t]{0.744\textwidth}
+	    \begin{center}
+	        \vspace{0.8cm}
+	        {\LARGE\textsf{ Universidad Politécnica de Chiapas}\par}
+	        \vspace{0.7cm}
+	        \hrule height2pt
+	        \vspace{.3cm}
+	        \hrule height1pt
+	        \vspace{2cm}
+	        {\Large\textsf{\@title}\par}
+	        \vspace{1.5cm}
+	        {{\textsf{\Large\@ingenieria}}}\par
+	        \vspace{3cm}
+	        \makebox[8cm][c]{\large\bfseries F U N D A M E N T O S $\;\;$D E$}\\[0.3cm]
+            \makebox[8cm][c]{\large\bfseries I N T E L I G E N C I A$\;\;$A R T I F I C I A L}\\[0.3cm]
+    	    {Presenta:\\[0.2cm]
+	        {\textsf{\large\@author}}}\par
+	        \vspace{2cm}
+	        %{Asesor Laboral\\[0.2cm]
+	        %{\textsf{\large\@AsesorLaboral}}}\par
+	        \vspace{1cm}
+	        {Docente\\[0.2cm]
+	        {\textsf{\large\@AsesorAcademico}}}\par
+	        \vspace{1cm}
+            %{Revisor Académico\\[0.2cm]
+	        %{\textsf{\large\@RevisorAcademico}}}
+	        \vfill
+	        {\textsf{\@ciudadyfecha}}
+	        \vspace{.99cm}
+	    \end{center}
+    \end{minipage}
+\end{titlepage}
+}
+\endinput

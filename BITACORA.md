@@ -113,3 +113,12 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
 - **Pruebas:** 97/97 Vitest, 4/4 E2E, lint ok, build ok, experimento sin fallas.
 - **Commit:** `ci: lint, pruebas, experimento, build y Playwright en GitHub Actions`.
 - **Pendiente:** que Luis agregue el remoto, haga push y revise la primera ejecución de la CI.
+
+## 2026-11-06 · Reporte y presentación
+
+- **Hecho:** reporte en LaTeX en `reporte/`, a partir de la plantilla del curso (`2026_C3_07C_FIA_PLANTILLA_1`): planteamiento, PEAS, especificación de la búsqueda, implementación con un bloque de código por función del motor, cuatro casos con capturas, los cuatro experimentos con dos gráficas (pgfplots), conclusiones, anexos y referencias. `scripts/capturas.ts` toma las capturas de la interfaz con Playwright (`npm run build && npm run capturas`) y `scripts/codigo-reporte.ts` copia las funciones del motor a `reporte/codigo/` (`npm run codigo-reporte`), para que los bloques de código coincidan con el código real. Presentación de 12 diapositivas aparte.
+- **Decisiones:** `reporte/` queda fuera de TypeScript, ESLint y Prettier porque `reporte/codigo/` son fragmentos sueltos. La clase `report` no define `\frontmatter` ni `\mainmatter`; se declaran vacías. Se mantuvo la ingeniería que trae la plantilla en la portada.
+- **Problemas:** la columna de nombres de la tabla de materias quedaba muy angosta en las capturas; se ajustaron los anchos. No hay LaTeX instalado en el equipo, así que el reporte no se compiló aquí.
+- **Pruebas:** 97/97 Vitest, 4/4 E2E, lint ok.
+- **Commit:** `docs(reporte): reporte en LaTeX con capturas, código y experimentos`.
+- **Pendiente:** compilar el reporte en Overleaf y revisar el PDF.

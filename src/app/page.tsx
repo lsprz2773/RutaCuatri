@@ -17,6 +17,12 @@ const PASOS = [
   ["Búsqueda", "Un primer plan rápido y mejoras sucesivas hasta el óptimo."],
 ];
 
+const FECHA = new Intl.DateTimeFormat("es-MX", { dateStyle: "medium", timeStyle: "short" });
+const fecha = (iso: string) => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "" : FECHA.format(d);
+};
+
 const COLOR_ETIQUETA = {
   óptimo: "verde",
   mejor: "azul",
@@ -32,7 +38,8 @@ export default function Inicio() {
 
   const abrirEjemplo = (id: string) => {
     const alumno = ESCENARIOS.alumnos.find((a) => a.id === id)!;
-    useStore.getState().reemplazar(borradorDeAlumno(alumno));
+    // Id fijo por alumno: volver a abrir el mismo ejemplo reemplaza su plan guardado, no lo duplica.
+    useStore.getState().reemplazar(borradorDeAlumno(alumno), null, `ejemplo-${alumno.id}`);
     iniciarBusqueda((errores) => {
       setAviso(errores.map((e) => e.mensaje).join(" "));
     });
@@ -130,6 +137,9 @@ export default function Inicio() {
                   </h3>
                   <Etiqueta color={COLOR_ETIQUETA[g.etiqueta]}>{g.etiqueta}</Etiqueta>
                 </div>
+                <p className="mt-1 text-sm text-gray-500" data-fecha>
+                  Guardado el {fecha(g.fecha)}
+                </p>
                 <p className="mt-1 text-gray-600">
                   {g.borrador.nombreMalla} · {aprobadasDe(g.borrador).length} materias aprobadas
                   {g.borrador.descripcion ? ` · ${g.borrador.descripcion}` : ""}

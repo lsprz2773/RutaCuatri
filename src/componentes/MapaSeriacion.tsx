@@ -15,10 +15,12 @@ export function MapaSeriacion({ materias, cadena }: { materias: Materia[]; caden
             <div className="mb-2 text-sm text-gray-600">Nivel {n}</div>
             <ul className="space-y-2">
               {materias
-                .filter((m) => m.nivel === n)
-                .map((m) => (
+                .map((m, i) => ({ m, i }))
+                .filter(({ m }) => m.nivel === n)
+                .map(({ m, i }) => (
                   <li
-                    key={m.clave}
+                    // Con índice: un CSV importado puede traer claves repetidas (la validación lo marca).
+                    key={`${i}-${m.clave}`}
                     className={`rounded-lg px-3 py-2 text-sm leading-snug ${
                       enCadena.has(m.clave)
                         ? "bg-blue-700 font-semibold text-white"

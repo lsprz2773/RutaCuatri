@@ -129,3 +129,24 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
 - **Problemas:** la plantilla original traía dos errores: opciones de idioma pasadas a `geometry` y un `$` sin cerrar en la portada (`D E$`) del archivo `.sty`; se corrigieron en la copia de `reporte/`, sin tocar la carpeta original. Se ajustaron anchos de tablas, dos conjuntos en modo matemático que no se podían partir, la gráfica de barras y las etiquetas de la gráfica del experimento A.
 - **Decisiones:** el PDF y los archivos auxiliares de LaTeX quedan fuera de git; el PDF se genera al compilar.
 - **Commit:** `docs(reporte): compilación limpia con pdflatex`.
+
+## 2026-11-10 01:20 · Auditoría de experiencia de usuario y correcciones
+
+- **Hecho:** auditoría del funcionamiento y de la experiencia de usuario, con el recorrido completo del camino feliz en el navegador (alumno de ejemplo y plan propio). Se corrigieron:
+  - **Edición de claves en Plan de estudios:** la clave se aplica al salir del campo o con Enter, no con cada tecla. Antes, una clave a medio escribir podía coincidir con otra (por ejemplo, ISW12 → ISW15 → ISW150) y mezclaba los prerrequisitos, además del error de React «Encountered two children with the same key». Una clave vacía o repetida se rechaza con un aviso en la fila. Al renombrar, también se mueven su estado en el historial y su lugar en la meta de materias específicas.
+  - **Planes guardados:** editar un plan abierto y volver a buscar actualiza ese plan en vez de crear un duplicado. Volver a abrir un alumno de ejemplo reemplaza su plan guardado. «Repruebo una» guarda un plan aparte con el título «… (replaneado)». Cada tarjeta muestra la fecha de guardado.
+  - **Gráfica de créditos:** la etiqueta de la carga normal pasa a una leyenda arriba a la izquierda, y el número de una barra se sube cuando chocaría con la línea punteada.
+  - **Meta:** ahora tiene título de página («Meta de …»), como las demás pantallas.
+  - **Plan de estudios:** en escritorio, los cuatro botones de la cabecera quedan en una sola fila.
+  - **Análisis:** el plan del escenario muestra la clave y el nombre de cada materia.
+  - **Detalle de cuatrimestre:** se agregó navegación «← Cuatrimestre n−1 · n de N · Cuatrimestre n+1 →».
+- **Decisiones:** el cambio de comportamiento en los planes guardados es intencional. Solo «Crear plan nuevo», cambiar de malla y «Repruebo una» crean un plan aparte. El mapa de seriación usa índice y clave como `key`, porque un CSV importado puede traer claves repetidas (la validación ya lo marca).
+- **Problemas:** el error de hidratación con atributos `bis_skin_checked` y `bis_register` en `npm run dev` lo causa la extensión de Bitdefender del navegador, no el código. En una ventana de incógnito no aparece.
+- **Pruebas:** 97/97 Vitest, 4/4 E2E, lint ok, build ok. Un script de Playwright confirmó las 23 comprobaciones de las correcciones, sin errores en la consola.
+- **Commit:** `fix(interfaz): edición de claves, planes guardados sin duplicados y ajustes de la auditoría`.
+- **Pendiente:** (vista celular fuera de alcance por ahora)
+  - Quitar una materia deja prerrequisitos rotos.
+  - No hay forma de vaciar la malla ni de quitar varias materias a la vez.
+  - No se pueden editar el tipo ni la especialidad de una materia.
+  - Los campos numéricos se rellenan con 1 o 0 al borrarlos.
+  - «Crear plan nuevo» y «Quitar» no piden confirmación.

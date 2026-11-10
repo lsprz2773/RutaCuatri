@@ -100,7 +100,11 @@ export function Cabecera({
         <h1 className="text-2xl font-bold break-words text-gray-900 sm:text-3xl">{titulo}</h1>
         {subtitulo && <p className="mt-1 text-gray-600">{subtitulo}</p>}
       </div>
-      {acciones && <div className="no-imprimir flex flex-wrap gap-3">{acciones}</div>}
+      {acciones && (
+        <div className="no-imprimir flex flex-wrap gap-3 lg:shrink-0 lg:flex-nowrap lg:justify-end lg:*:whitespace-nowrap">
+          {acciones}
+        </div>
+      )}
     </div>
   );
 }

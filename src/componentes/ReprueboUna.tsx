@@ -31,7 +31,11 @@ export function ReprueboUna({
       b.periodo = NOMBRES_PERIODO[(actual.periodo + 1) % 3];
       const nombre = materias.find((m) => m.clave === elegida)?.nombre ?? elegida;
       b.descripcion = `replaneado: reprobó ${nombre}`;
+      if (!b.titulo.endsWith(" (replaneado)")) b.titulo = `${b.titulo} (replaneado)`;
     });
+    // El replaneo es un escenario nuevo: se guarda aparte y el plan original se conserva.
+    st.separar();
+    setElegida("");
     dialogo.current?.close();
     iniciarBusqueda();
   };

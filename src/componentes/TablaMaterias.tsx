@@ -33,6 +33,55 @@ function EntradaLista(props: {
   );
 }
 
+/**
+ * Clave editable: el cambio se aplica al salir del campo o con Enter, no con cada tecla, para que
+ * una clave a medio escribir no choque con otra existente. Vacía o repetida se rechaza.
+ */
+function EntradaClave(props: {
+  fila: number;
+  className: string;
+  valor: string;
+  otras: string[];
+  alCambiar: (v: string) => void;
+}) {
+  const [texto, setTexto] = useState<string | null>(null);
+  const limpio = texto?.trim() ?? props.valor;
+  const problema =
+    texto === null
+      ? null
+      : limpio === ""
+        ? "La clave no puede quedar vacía."
+        : limpio !== props.valor && props.otras.includes(limpio)
+          ? `La clave ${limpio} ya existe.`
+          : null;
+  const aplicar = () => {
+    if (texto === null) return;
+    if (!problema && limpio !== props.valor) props.alCambiar(limpio);
+    setTexto(null);
+  };
+  return (
+    <>
+      <input
+        aria-label={`Clave de la fila ${props.fila}`}
+        aria-invalid={problema ? true : undefined}
+        className={`${props.className} ${problema ? "border-red-500" : ""}`}
+        value={texto ?? props.valor}
+        onChange={(e) => setTexto(e.target.value)}
+        onBlur={aplicar}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") aplicar();
+          if (e.key === "Escape") setTexto(null);
+        }}
+      />
+      {problema && (
+        <div className="mt-1 text-xs font-semibold text-red-700" role="alert">
+          {problema} Se conservará {props.valor}.
+        </div>
+      )}
+    </>
+  );
+}
+
 interface Props {
   materias: Materia[];
   /** Claves con error de validación; la fila se marca. */
@@ -84,11 +133,12 @@ export function TablaMaterias({ materias, conError, alCambiar, alQuitar }: Props
                 data-error={error || undefined}
               >
                 <td className={celda}>
-                  <input
-                    aria-label={`Clave de la fila ${i + 1}`}
+                  <EntradaClave
+                    fila={i + 1}
                     className={`${entrada} font-mono`}
-                    value={m.clave}
-                    onChange={(e) => cambiar(i, { clave: e.target.value.trim() })}
+                    valor={m.clave}
+                    otras={materias.filter((_, j) => j !== i).map((x) => x.clave)}
+                    alCambiar={(clave) => cambiar(i, { clave })}
                   />
                 </td>
                 <td className={celda}>

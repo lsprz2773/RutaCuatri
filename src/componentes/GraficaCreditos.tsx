@@ -12,11 +12,19 @@ export function GraficaCreditos({
 }) {
   const W = 800;
   const alto = 260;
-  const arriba = 28;
+  // Margen superior para la leyenda de la carga normal, fuera del área de las barras.
+  const arriba = 44;
   const abajo = 30;
   const tope = Math.max(Cmax, ...plan.map((q) => q.creditos), 1);
   const y = (v: number) => arriba + (alto - arriba - abajo) * (1 - v / tope);
   const ancho = W / Math.max(plan.length, 1);
+  // El número de cada barra va sobre la barra; si quedaría encima de la línea de la carga normal,
+  // se sube por arriba de la línea para que no se crucen.
+  const etiquetaY = (v: number) => {
+    const sobre = y(v) - 6;
+    const linea = y(Cnorm);
+    return sobre > linea - 16 && sobre < linea + 14 ? Math.min(y(v), linea) - 8 : sobre;
+  };
   return (
     <figure>
       <svg
@@ -40,7 +48,7 @@ export function GraficaCreditos({
               />
               <text
                 x={x + w / 2}
-                y={y(q.creditos) - 6}
+                y={etiquetaY(q.creditos)}
                 textAnchor="middle"
                 className="fill-gray-800 text-[13px]"
               >
@@ -67,9 +75,20 @@ export function GraficaCreditos({
           strokeWidth={2}
           className="stroke-orange-700"
         />
-        <text x={W - 4} y={y(Cnorm) - 6} textAnchor="end" className="fill-orange-800 text-[13px]">
-          carga normal {Cnorm}
-        </text>
+        <g aria-hidden="true">
+          <line
+            x1={4}
+            x2={34}
+            y1={14}
+            y2={14}
+            strokeDasharray="6 5"
+            strokeWidth={2}
+            className="stroke-orange-700"
+          />
+          <text x={42} y={18} className="fill-orange-800 text-[13px]">
+            carga normal {Cnorm} créditos
+          </text>
+        </g>
       </svg>
       <details className="no-imprimir mt-2 text-sm text-gray-700">
         <summary className="cursor-pointer">Ver como tabla</summary>

@@ -1,7 +1,16 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { Aviso, Boton, Cargando, Enlace, Pagina, Tarjeta, Titulo } from "@/componentes/ui";
+import {
+  Aviso,
+  Boton,
+  Cabecera,
+  Cargando,
+  Enlace,
+  Pagina,
+  Tarjeta,
+  Titulo,
+} from "@/componentes/ui";
 import { iniciarBusqueda } from "@/estado/busqueda";
 import {
   PERFIL_MEDIO,
@@ -110,6 +119,10 @@ export default function MetaYParametros() {
 
   return (
     <Pagina>
+      <Cabecera
+        titulo={`Meta de ${b.titulo}`}
+        subtitulo={`${b.nombreMalla}${b.planMalla ? ` · plan ${b.planMalla}` : ""} · elige qué quieres terminar, la carga por cuatrimestre y cómo se busca`}
+      />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-w-0 space-y-6">
           <Tarjeta>
@@ -159,8 +172,8 @@ export default function MetaYParametros() {
               <fieldset className="mt-4">
                 <legend className="text-sm text-gray-700">Materias de la meta G</legend>
                 <div className="mt-2 grid max-h-72 gap-1 overflow-y-auto sm:grid-cols-2">
-                  {b.materias.map((m) => (
-                    <label key={m.clave} className="flex items-center gap-2 text-sm">
+                  {b.materias.map((m, i) => (
+                    <label key={`${i}-${m.clave}`} className="flex items-center gap-2 text-sm">
                       <input
                         type="checkbox"
                         checked={b.meta.claves.includes(m.clave)}

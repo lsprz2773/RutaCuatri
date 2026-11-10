@@ -11,12 +11,14 @@ export const MAX_GUARDADOS = 20;
 export interface Store {
   borrador: Borrador;
   resultado: ResultadoPlan | null;
-  /** Id del plan guardado que corresponde al borrador actual. */
+  /** Id del plan guardado que corresponde al borrador actual; editar el borrador lo conserva. */
   idActual: string | null;
   guardados: PlanGuardado[];
   busqueda: EstadoBusqueda;
   cambiar: (f: (b: Borrador) => void) => void;
   reemplazar: (b: Borrador, resultado?: ResultadoPlan | null, id?: string | null) => void;
+  /** Hace que el siguiente guardado cree un plan aparte en lugar de actualizar el actual. */
+  separar: () => void;
   fijarResultado: (r: ResultadoPlan | null) => void;
   fijarBusqueda: (f: (e: EstadoBusqueda) => EstadoBusqueda) => void;
   guardar: (etiqueta: PlanGuardado["etiqueta"]) => void;
@@ -48,8 +50,9 @@ export const useStore = create<Store>()(
         set((s) => {
           const b = structuredClone(s.borrador);
           f(b);
-          // Cualquier cambio invalida el resultado anterior y empieza un plan distinto.
-          return { borrador: b, resultado: null, idActual: null };
+          // Cualquier cambio invalida el resultado anterior; el plan guardado se actualiza al
+          // terminar la siguiente búsqueda (no se duplica).
+          return { borrador: b, resultado: null };
         }),
       reemplazar: (b, resultado = null, id = null) =>
         set({
@@ -58,6 +61,7 @@ export const useStore = create<Store>()(
           idActual: id,
           busqueda: busquedaInactiva(),
         }),
+      separar: () => set({ idActual: null }),
       fijarResultado: (r) => set({ resultado: r }),
       fijarBusqueda: (f) => set((s) => ({ busqueda: f(s.busqueda) })),
       guardar: (etiqueta) => {

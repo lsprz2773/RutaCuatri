@@ -248,7 +248,16 @@ export default function Analisis() {
                     <div className="text-sm text-gray-600">
                       {i + 1} · {mesesCortos(q.periodo)}
                     </div>
-                    <div>{q.materias.join(", ") || "Sin inscripción"}</div>
+                    <div>
+                      {q.materias.length > 0
+                        ? q.materias.map((k) => (
+                            <span key={k} className="block leading-snug">
+                              <span className="font-mono text-sm text-gray-600">{k}</span>{" "}
+                              {b.materias.find((m) => m.clave === k)?.nombre ?? ""}
+                            </span>
+                          ))
+                        : "Sin inscripción"}
+                    </div>
                     <div className="font-mono text-sm text-gray-700">
                       {q.creditos} cr · {q.costo.toFixed(2)}
                     </div>

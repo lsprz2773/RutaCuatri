@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Aviso, Cargando, Pagina, Tarjeta, Titulo } from "@/componentes/ui";
+import { Aviso, Cargando, Enlace, Pagina, Tarjeta, Titulo } from "@/componentes/ui";
 import { alternativas, habilita } from "@/estado/analisis";
 import { aniosDelPlan, formatoCosto, mesesLargos, problemaDe } from "@/estado/derivados";
 import { explicar } from "@/estado/explicacion";
@@ -110,9 +110,30 @@ export function DetalleCuatrimestre({ n }: { n: number }) {
 
   return (
     <Pagina>
-      <Link href="/plan/resultado/" className="text-blue-700 underline">
-        Volver al plan
-      </Link>
+      <nav
+        aria-label="Cuatrimestres"
+        className="flex flex-wrap items-center justify-between gap-3"
+        data-nav-cuatrimestres
+      >
+        <Link href="/plan/resultado/" className="text-blue-700 underline">
+          Volver al plan
+        </Link>
+        <div className="flex items-center gap-2">
+          {n > 1 ? (
+            <Enlace href={`/plan/resultado/${n - 1}/`} rel="prev">
+              ← Cuatrimestre {n - 1}
+            </Enlace>
+          ) : null}
+          <span className="px-2 text-sm text-gray-600">
+            {n} de {plan.length}
+          </span>
+          {n < plan.length ? (
+            <Enlace href={`/plan/resultado/${n + 1}/`} rel="next">
+              Cuatrimestre {n + 1} →
+            </Enlace>
+          ) : null}
+        </div>
+      </nav>
       <h1 className="mt-2 text-2xl font-bold sm:text-3xl">
         Cuatrimestre {n} · {mesesLargos(NOMBRES_PERIODO[q.periodo]).toLowerCase()} · año {anio}
       </h1>

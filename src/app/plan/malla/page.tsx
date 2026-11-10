@@ -186,12 +186,18 @@ export default function PlanDeEstudios() {
                     const anterior = x.materias[i].clave;
                     x.materias[i] = m;
                     if (anterior !== m.clave) {
-                      // Renombrar una clave actualiza los prerrequisitos que la usan.
+                      // Renombrar una clave actualiza los prerrequisitos que la usan, su estado en
+                      // el historial y la meta de materias específicas.
                       for (const o of x.materias) {
                         o.prerrequisitos = o.prerrequisitos.map((p) =>
                           p === anterior ? m.clave : p,
                         );
                       }
+                      if (anterior in x.estados) {
+                        x.estados[m.clave] = x.estados[anterior];
+                        delete x.estados[anterior];
+                      }
+                      x.meta.claves = x.meta.claves.map((k) => (k === anterior ? m.clave : k));
                     }
                   })
                 }

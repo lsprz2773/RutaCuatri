@@ -11,6 +11,7 @@ import {
   Tarjeta,
   Titulo,
 } from "@/componentes/ui";
+import { CampoNumero } from "@/componentes/interaccion";
 import { iniciarBusqueda } from "@/estado/busqueda";
 import {
   PERFIL_MEDIO,
@@ -42,6 +43,7 @@ export default function MetaYParametros() {
   const cambiar = useStore((s) => s.cambiar);
   const [nuevoH, setNuevoH] = useState("");
   const [errores, setErrores] = useState<string[]>([]);
+  const [avisoPasada, setAvisoPasada] = useState<string | null>(null);
 
   const resumen = useMemo(() => {
     const pb = problemaDe(b);
@@ -83,10 +85,9 @@ export default function MetaYParametros() {
     { tipo: "especificas", titulo: "Materias específicas", texto: "Tú eliges el conjunto G" },
   ];
 
-  const numero = (campo: keyof typeof par, v: string) =>
+  const numero = (campo: keyof typeof par, n: number) =>
     cambiar((x) => {
-      const n = Number(v);
-      if (Number.isFinite(n)) x.parametros[campo] = n;
+      x.parametros[campo] = n;
     });
 
   const ejemplos = [0, par.Cnorm, Math.round((par.Cnorm + par.Cmax) / 2), par.Cmax].filter(
@@ -95,7 +96,15 @@ export default function MetaYParametros() {
 
   const agregarPasada = () => {
     const v = Number(nuevoH);
-    if (!(v > 1) || b.pesos.includes(v)) return;
+    if (nuevoH.trim() === "" || !Number.isFinite(v) || v <= 1) {
+      setAvisoPasada("El peso H debe ser un número mayor que 1 (H = 1 ya es la pasada óptima).");
+      return;
+    }
+    if (b.pesos.includes(v)) {
+      setAvisoPasada(`Ya hay una pasada con H = ${v}.`);
+      return;
+    }
+    setAvisoPasada(null);
     cambiar((x) => {
       x.pesos = [...x.pesos, v].sort((a, c) => c - a);
     });
@@ -210,43 +219,40 @@ export default function MetaYParametros() {
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <label className="text-sm text-gray-700">
                 Carga normal (créditos)
-                <input
-                  type="number"
+                <CampoNumero
                   min={0}
                   className={campo}
-                  value={par.Cnorm}
-                  onChange={(e) => numero("Cnorm", e.target.value)}
+                  valor={par.Cnorm}
+                  alCambiar={(n) => numero("Cnorm", n)}
                 />
               </label>
               <label className="text-sm text-gray-700">
                 Carga máxima (créditos)
-                <input
-                  type="number"
+                <CampoNumero
                   min={1}
                   className={campo}
-                  value={par.Cmax}
-                  onChange={(e) => numero("Cmax", e.target.value)}
+                  valor={par.Cmax}
+                  alCambiar={(n) => numero("Cmax", n)}
                 />
               </label>
               <label className="text-sm text-gray-700">
                 Penalización β por crédito extra
-                <input
-                  type="number"
+                <CampoNumero
                   min={0}
                   step={0.05}
                   className={campo}
-                  value={par.beta}
-                  onChange={(e) => numero("beta", e.target.value)}
+                  valor={par.beta}
+                  alCambiar={(n) => numero("beta", n)}
                 />
               </label>
               <label className="text-sm text-gray-700">
                 Materias por cuatrimestre (K)
-                <input
-                  type="number"
+                <CampoNumero
                   min={1}
+                  entero
                   className={campo}
-                  value={par.K}
-                  onChange={(e) => numero("K", e.target.value)}
+                  valor={par.K}
+                  alCambiar={(n) => numero("K", n)}
                 />
               </label>
             </div>
@@ -300,10 +306,19 @@ export default function MetaYParametros() {
                 placeholder="H"
                 className="w-20 rounded-lg border border-gray-300 px-2 py-2"
                 value={nuevoH}
-                onChange={(e) => setNuevoH(e.target.value)}
+                onChange={(e) => {
+                  setNuevoH(e.target.value);
+                  setAvisoPasada(null);
+                }}
+                onKeyDown={(e) => e.key === "Enter" && agregarPasada()}
               />
               <Boton onClick={agregarPasada}>Agregar pasada</Boton>
             </div>
+            {avisoPasada && (
+              <p className="mt-2 text-sm font-semibold text-red-700" role="alert">
+                {avisoPasada}
+              </p>
+            )}
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <label className="text-sm text-gray-700">
                 Tiempo máximo de búsqueda

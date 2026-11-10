@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
+import { AvisoDeshacer, useConfirmar } from "@/componentes/interaccion";
 import { MapaSeriacion } from "@/componentes/MapaSeriacion";
 import { TablaMaterias } from "@/componentes/TablaMaterias";
 import {
@@ -16,18 +17,24 @@ import {
 import { MALLAS } from "@/datos/cargar";
 import { exportarMallaCsv, importarMallaCsv } from "@/datos/csv";
 import { descargar, elegirArchivo } from "@/estado/archivos";
-import { borradorVacio, formatoEntero } from "@/estado/derivados";
+import { borradorVacio, formatoEntero, quitarMaterias } from "@/estado/derivados";
 import { useHidratado } from "@/estado/hidratado";
 import { useStore } from "@/estado/store";
 import { detalleH } from "@/motor/heuristica";
 import { validarMalla } from "@/motor/validacion";
+import type { Borrador } from "@/estado/tipos";
 import type { Materia } from "@/motor/tipos";
+
+type Respaldo = Pick<Borrador, "materias" | "estados" | "meta">;
 
 export default function PlanDeEstudios() {
   const hidratado = useHidratado();
   const b = useStore((s) => s.borrador);
   const cambiar = useStore((s) => s.cambiar);
   const [avisoCsv, setAvisoCsv] = useState<string[]>([]);
+  const [seleccion, setSeleccion] = useState<Set<number>>(new Set());
+  const [deshacer, setDeshacer] = useState<{ texto: string; antes: Respaldo } | null>(null);
+  const [dialogo, confirmar] = useConfirmar();
 
   const errores = useMemo(() => validarMalla(b.materias), [b.materias]);
   const conError = useMemo(
@@ -60,23 +67,77 @@ export default function PlanDeEstudios() {
   const masPesada = Math.max(0, ...b.materias.map((m) => m.creditos));
   const ciclo = errores.find((e) => e.mensaje.includes("ciclo"));
 
-  const elegirMalla = (id: string) => {
+  const elegirMalla = async (id: string) => {
     const malla = MALLAS.find((m) => m.id === id);
-    if (!malla) return;
+    if (b.materias.length > 0) {
+      const ok = await confirmar({
+        titulo: malla ? `¿Cambiar a ${malla.nombre}?` : "¿Empezar con una malla en blanco?",
+        texto: `Se reemplazan las ${b.materias.length} materias actuales y se borra el historial marcado. Se conservan el nombre y la descripción del plan.`,
+        aceptar: malla ? "Cambiar de malla" : "Empezar en blanco",
+      });
+      if (!ok) return;
+    }
     useStore
       .getState()
       .reemplazar({ ...borradorVacio(malla), titulo: b.titulo, descripcion: b.descripcion });
+    setSeleccion(new Set());
+    setDeshacer(null);
   };
 
-  const agregar = () =>
+  const respaldo = (): Respaldo => ({ materias: b.materias, estados: b.estados, meta: b.meta });
+
+  /** Quita filas, limpia sus referencias y ofrece deshacer. */
+  const quitar = (filas: number[]) => {
+    if (filas.length === 0) return;
+    const antes = respaldo();
+    const nombres = filas.map((i) => b.materias[i]?.clave).filter(Boolean);
+    let afectadas = 0;
     cambiar((x) => {
-      let n = x.materias.length + 1;
-      while (x.materias.some((m) => m.clave === `M${String(n).padStart(2, "0")}`)) n++;
+      afectadas = quitarMaterias(x, filas);
+    });
+    setSeleccion(new Set());
+    const que =
+      nombres.length === 1 ? `Se quitó ${nombres[0]}` : `Se quitaron ${nombres.length} materias`;
+    setDeshacer({
+      antes,
+      texto:
+        afectadas > 0
+          ? `${que}; ${afectadas} materia${afectadas === 1 ? "" : "s"} ya no la${nombres.length === 1 ? "" : "s"} tiene${afectadas === 1 ? "" : "n"} como prerrequisito.`
+          : `${que}.`,
+    });
+  };
+
+  const vaciar = async () => {
+    const ok = await confirmar({
+      titulo: "¿Vaciar la malla?",
+      texto: `Se quitan las ${b.materias.length} materias y el historial marcado. Podrás deshacerlo justo después.`,
+      aceptar: "Vaciar malla",
+    });
+    if (ok) quitar(b.materias.map((_, i) => i));
+  };
+
+  const restaurar = () => {
+    if (!deshacer) return;
+    const { antes } = deshacer;
+    cambiar((x) => {
+      x.materias = antes.materias;
+      x.estados = antes.estados;
+      x.meta = antes.meta;
+    });
+    setDeshacer(null);
+  };
+
+  const agregar = () => {
+    let n = b.materias.length + 1;
+    while (b.materias.some((m) => m.clave === `M${String(n).padStart(2, "0")}`)) n++;
+    const clave = `M${String(n).padStart(2, "0")}`;
+    cambiar((x) => {
       x.materias.push({
-        clave: `M${String(n).padStart(2, "0")}`,
+        clave,
         nombre: "Materia nueva",
         creditos: 6,
-        nivel: 1,
+        // Al nivel más alto existente: suele ser donde se agrega la siguiente materia.
+        nivel: Math.max(1, ...x.materias.map((m) => m.nivel)),
         prerrequisitos: [],
         oferta: ["Ene", "May", "Sep"],
         tipo: "obligatoria",
@@ -84,6 +145,16 @@ export default function PlanDeEstudios() {
         exclusiva: false,
       });
     });
+    // La fila nueva queda al final de la tabla: se lleva la vista hasta ella y se enfoca su nombre.
+    requestAnimationFrame(() => {
+      const campo = document.querySelector<HTMLInputElement>(
+        `input[aria-label="Nombre de ${clave}"]`,
+      );
+      campo?.scrollIntoView({ block: "center", behavior: "smooth" });
+      campo?.focus();
+      campo?.select();
+    });
+  };
 
   const importar = async () => {
     const texto = await elegirArchivo(".csv,text/csv");
@@ -91,6 +162,17 @@ export default function PlanDeEstudios() {
     const r = importarMallaCsv(texto);
     setAvisoCsv(r.errores);
     if (r.datos.length > 0) {
+      if (
+        b.materias.length > 0 &&
+        !(await confirmar({
+          titulo: "¿Reemplazar la malla con el CSV?",
+          texto: `El archivo trae ${r.datos.length} materias. Se reemplazan las ${b.materias.length} actuales y se borra el historial marcado.`,
+          aceptar: "Reemplazar",
+        }))
+      )
+        return;
+      setSeleccion(new Set());
+      setDeshacer(null);
       cambiar((x) => {
         x.materias = r.datos;
         x.mallaId = null;
@@ -103,6 +185,7 @@ export default function PlanDeEstudios() {
 
   return (
     <Pagina>
+      {dialogo}
       <Cabecera
         titulo={`${b.nombreMalla}${b.planMalla ? ` · plan ${b.planMalla}` : ""}`}
         subtitulo={`${b.materias.length} materias · ${creditos} créditos · 3 periodos por año (enero, mayo y septiembre)`}
@@ -134,10 +217,10 @@ export default function PlanDeEstudios() {
           id="malla"
           className="rounded-lg border border-gray-300 bg-white px-3 py-2"
           value={b.mallaId ?? ""}
-          onChange={(e) => elegirMalla(e.target.value)}
+          onChange={(e) => void elegirMalla(e.target.value)}
         >
-          <option value="" disabled>
-            Elige una malla…
+          <option value="">
+            {b.materias.length > 0 && !b.mallaId ? "Malla propia" : "Malla en blanco"}
           </option>
           {MALLAS.map((m) => (
             <option key={m.id} value={m.id}>
@@ -145,7 +228,31 @@ export default function PlanDeEstudios() {
             </option>
           ))}
         </select>
+        <label className="flex items-center gap-2 text-sm text-gray-700">
+          Nombre
+          <input
+            className="w-64 rounded-lg border border-gray-300 bg-white px-3 py-2 text-base text-gray-900"
+            value={b.nombreMalla}
+            onChange={(e) => cambiar((x) => void (x.nombreMalla = e.target.value))}
+          />
+        </label>
+        {(["A", "B"] as const).map((e) => (
+          <label key={e} className="flex items-center gap-2 text-sm text-gray-700">
+            Especialidad {e}
+            <input
+              className="w-48 rounded-lg border border-gray-300 bg-white px-3 py-2 text-base text-gray-900"
+              value={b.especialidades[e]}
+              onChange={(ev) => cambiar((x) => void (x.especialidades[e] = ev.target.value))}
+            />
+          </label>
+        ))}
       </div>
+
+      {deshacer && (
+        <AvisoDeshacer alDeshacer={restaurar} alCerrar={() => setDeshacer(null)}>
+          {deshacer.texto}
+        </AvisoDeshacer>
+      )}
 
       {avisoCsv.length > 0 && (
         <div className="mb-6">
@@ -177,10 +284,36 @@ export default function PlanDeEstudios() {
                   menos de {analisis.L} cuatrimestres.
                 </p>
               )}
-              <h2 className="mt-8 mb-3 text-lg font-semibold">Materias</h2>
+              <div className="mt-8 mb-3 flex min-h-10 flex-wrap items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold">Materias</h2>
+                {seleccion.size === 0 && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-600">
+                      Marca las casillas para quitar varias a la vez
+                    </span>
+                    <Boton variante="peligro" onClick={vaciar}>
+                      Vaciar malla
+                    </Boton>
+                  </div>
+                )}
+                {seleccion.size > 0 && (
+                  <div className="flex items-center gap-3" data-barra-seleccion>
+                    <span className="text-sm text-gray-700">
+                      {seleccion.size} seleccionada{seleccion.size === 1 ? "" : "s"}
+                    </span>
+                    <Boton onClick={() => setSeleccion(new Set())}>Cancelar</Boton>
+                    <Boton variante="peligro" onClick={() => quitar([...seleccion])}>
+                      Quitar seleccionadas
+                    </Boton>
+                  </div>
+                )}
+              </div>
               <TablaMaterias
                 materias={b.materias}
                 conError={conError}
+                especialidades={b.especialidades}
+                seleccion={seleccion}
+                alSeleccionar={setSeleccion}
                 alCambiar={(i, m: Materia) =>
                   cambiar((x) => {
                     const anterior = x.materias[i].clave;
@@ -201,11 +334,7 @@ export default function PlanDeEstudios() {
                     }
                   })
                 }
-                alQuitar={(i) =>
-                  cambiar((x) => {
-                    x.materias.splice(i, 1);
-                  })
-                }
+                alQuitar={(i) => quitar([i])}
               />
             </>
           )}

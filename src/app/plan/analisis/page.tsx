@@ -13,7 +13,7 @@ import { useHidratado } from "@/estado/hidratado";
 import { useStore } from "@/estado/store";
 import { h } from "@/motor/heuristica";
 import { NOMBRE_METODO, type Metodo, type ResultadoMetodo } from "@/motor/metodos";
-import { validar } from "@/motor/validacion";
+import { validar, validarParametros } from "@/motor/validacion";
 import type { Problema } from "@/motor/tipos";
 import { correrLote } from "@/worker/cliente";
 
@@ -40,6 +40,7 @@ export default function Analisis() {
     datos: Partial<Record<Metodo, ResultadoMetodo>>;
   }>({ pb: null, datos: {} });
   const [guardado, setGuardado] = useState<string | null>(null);
+  const [avisoFila, setAvisoFila] = useState<string | null>(null);
 
   const pb = useMemo(() => problemaDe(b), [b]);
   const errores = useMemo(() => validar(pb), [pb]);
@@ -134,9 +135,31 @@ export default function Analisis() {
 
   const agregar = () => {
     const v = Number(valor);
-    if (!Number.isFinite(v)) return;
+    if (valor.trim() === "" || !Number.isFinite(v)) {
+      setAvisoFila("Escribe un número.");
+      return;
+    }
+    if (v < 0) {
+      setAvisoFila("El valor no puede ser negativo.");
+      return;
+    }
     const nueva = variante(b.parametros, parametro, v);
-    if (!variantes.some((x) => x.etiqueta === nueva.etiqueta)) setExtras((e) => [...e, nueva]);
+    const problemas = validarParametros({ ...pb, ...nueva.parametros });
+    if (problemas.length > 0) {
+      setAvisoFila(problemas.map((e) => e.mensaje).join(" "));
+      return;
+    }
+    if (variantes.some((x) => x.etiqueta === nueva.etiqueta)) {
+      setAvisoFila(`La fila «${nueva.etiqueta}» ya está en la tabla.`);
+      return;
+    }
+    setAvisoFila(null);
+    setExtras((e) => [...e, nueva]);
+  };
+
+  const quitarFila = (etiqueta: string) => {
+    setExtras((e) => e.filter((x) => x.etiqueta !== etiqueta));
+    setElegida(null);
   };
 
   const guardarEscenario = () => {
@@ -203,6 +226,19 @@ export default function Analisis() {
                         <button type="button" className="text-left" onClick={() => setElegida(i)}>
                           {v.base ? <strong>{v.etiqueta}</strong> : v.etiqueta}
                         </button>
+                        {extras.includes(v) && (
+                          <button
+                            type="button"
+                            aria-label={`Quitar la fila ${v.etiqueta}`}
+                            className="ml-2 rounded px-1.5 text-gray-500 hover:bg-gray-100 hover:text-red-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              quitarFila(v.etiqueta);
+                            }}
+                          >
+                            ×
+                          </button>
+                        )}
                       </td>
                       <td className="px-3 py-3" data-costo={r?.costo ?? undefined}>
                         {r ? (r.costo === null ? "no terminó" : formatoCosto(r.costo)) : "…"}
@@ -334,9 +370,17 @@ export default function Analisis() {
                 step="any"
                 className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5"
                 value={valor}
-                onChange={(e) => setValor(e.target.value)}
+                onChange={(e) => {
+                  setValor(e.target.value);
+                  setAvisoFila(null);
+                }}
               />
             </label>
+            {avisoFila && (
+              <p className="mt-2 text-sm font-semibold text-red-700" role="alert">
+                {avisoFila}
+              </p>
+            )}
             <Boton variante="primario" className="mt-4 w-full py-3" onClick={agregar}>
               Agregar fila
             </Boton>

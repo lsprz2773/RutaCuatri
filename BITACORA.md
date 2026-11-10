@@ -150,3 +150,27 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
   - No se pueden editar el tipo ni la especialidad de una materia.
   - Los campos numéricos se rellenan con 1 o 0 al borrarlos.
   - «Crear plan nuevo» y «Quitar» no piden confirmación.
+
+## 2026-11-10 02:10 · Edición de la malla, confirmaciones y campos numéricos
+
+- **Hecho:** se atendieron los pendientes de la auditoría (la vista celular sigue fuera de alcance):
+  - **Quitar materias:** al quitar una materia, ya sea con «×», con «Quitar seleccionadas» o con «Vaciar malla», se limpian los prerrequisitos que la usaban, su estado en el historial y la meta de materias específicas (`quitarMaterias` en `src/estado/derivados.ts`). Ya no quedan errores de «prerrequisito que no existe» bloqueando el paso. Aparece un aviso abajo, al centro, con «Deshacer».
+  - **Edición masiva:** casillas por fila y «Seleccionar todas» para quitar varias materias a la vez, y botón «Vaciar malla» con confirmación. El selector de malla tiene la opción «Malla en blanco» (o «Malla propia» si se importó un CSV).
+  - **Datos de la malla editables:** nombre de la malla, nombres de las especialidades A y B, y tipo de cada materia (obligatoria u optativa de la especialidad A o B). Con esto, una malla propia puede usar las metas por especialidad.
+  - **«Agregar materia»:** lleva la vista a la fila nueva y enfoca su nombre. La materia nueva toma el nivel más alto existente.
+  - **Campos numéricos** (créditos y nivel en la tabla; cargas, β y K en Meta): se pueden borrar y reescribir sin que salten a 1 o 0. Solo aplican valores válidos, y al salir del campo vacío vuelve el último valor (`CampoNumero` en `src/componentes/interaccion.tsx`).
+  - **Confirmaciones:** cambiar de malla o importar un CSV con materias cargadas pide confirmación. «Crear plan nuevo», abrir un ejemplo o abrir un plan guardado preguntan antes de descartar un borrador que no coincide con ningún plan guardado. «Quitar» un plan guardado ofrece «Deshacer».
+  - **Meta:** «Agregar pasada» explica por qué no agrega (H ≤ 1 o repetida). Enter también agrega la pasada.
+  - **Análisis:** «Agregar fila» valida el valor (número, no negativo, K entero ≥ 1, carga normal ≤ máxima) y las filas agregadas se pueden quitar con «×».
+- **Decisiones:**
+  - Para quitar una materia se usa «Deshacer» en lugar de una confirmación, porque es más rápido y no se pierde nada. Las acciones masivas o que reemplazan todo («Vaciar malla», cambiar de malla, importar CSV, descartar el borrador) sí piden confirmación.
+  - Las confirmaciones usan un `<dialog>` propio (`useConfirmar`), no `window.confirm`.
+- **Problemas:** la tabla de materias sigue necesitando desplazamiento horizontal dentro de su tarjeta a 1440 px, igual que antes. Al hacer clic en «×» de la última columna, la tabla se desplaza y oculta la columna de clave.
+- **Pruebas:** 100/100 Vitest (3 nuevas para `quitarMaterias`), 4/4 E2E, lint ok, build ok. Un script de Playwright confirmó las 33 comprobaciones del flujo, sin errores en la consola.
+- **Commit:** `feat(malla): quitar varias materias con limpieza de seriación, deshacer y confirmaciones`.
+- **Pendiente:**
+  - Vista celular.
+  - Ancho de la tabla de materias.
+  - Marcar en bloque en el historial (por ejemplo, «aprobar hasta el nivel N»).
+  - El botón «Compartir con tutor» descarga un JSON y abre la impresión; su nombre no lo dice.
+  - El límite de 31 materias del motor no se explica antes de llegar a él.

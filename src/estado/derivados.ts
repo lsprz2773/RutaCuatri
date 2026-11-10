@@ -34,6 +34,29 @@ export function clavesMeta(
   }
 }
 
+/**
+ * Quita las materias de las filas indicadas y limpia lo que dependía de ellas: los prerrequisitos
+ * que las usaban, su estado en el historial y la meta de materias específicas. Modifica `b`.
+ * Devuelve cuántas materias perdieron un prerrequisito.
+ */
+export function quitarMaterias(b: Borrador, filas: Iterable<number>): number {
+  const quitar = new Set(filas);
+  const claves = new Set(b.materias.filter((_, i) => quitar.has(i)).map((m) => m.clave));
+  b.materias = b.materias.filter((_, i) => !quitar.has(i));
+  // Si queda otra materia con la misma clave (CSV con repetidas), sus referencias siguen válidas.
+  const siguen = new Set(b.materias.map((m) => m.clave));
+  const huerfanas = new Set([...claves].filter((k) => !siguen.has(k)));
+  let afectadas = 0;
+  for (const m of b.materias) {
+    const antes = m.prerrequisitos.length;
+    m.prerrequisitos = m.prerrequisitos.filter((p) => !huerfanas.has(p));
+    if (m.prerrequisitos.length !== antes) afectadas++;
+  }
+  for (const k of huerfanas) delete b.estados[k];
+  b.meta.claves = b.meta.claves.filter((k) => !huerfanas.has(k));
+  return afectadas;
+}
+
 export function aprobadasDe(b: Borrador): string[] {
   return b.materias.filter((m) => b.estados[m.clave] === "aprobada").map((m) => m.clave);
 }

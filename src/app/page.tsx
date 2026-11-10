@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { AvisoDeshacer, useConfirmar } from "@/componentes/interaccion";
 import { Aviso, Boton, Etiqueta, Pagina } from "@/componentes/ui";
 import { ESCENARIOS, MALLAS } from "@/datos/cargar";
 import { descargar, elegirArchivo, leerPlanes } from "@/estado/archivos";
@@ -35,8 +36,33 @@ export default function Inicio() {
   const hidratado = useHidratado();
   const guardados = useStore((s) => s.guardados);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [quitado, setQuitado] = useState<{ titulo: string; antes: PlanGuardado[] } | null>(null);
+  const [dialogo, confirmar] = useConfirmar();
 
-  const abrirEjemplo = (id: string) => {
+  /**
+   * El borrador solo se guarda al terminar una búsqueda. Antes de reemplazarlo se pregunta si
+   * tiene materias y no coincide con ningún plan guardado.
+   */
+  const puedeDescartar = async () => {
+    const s = useStore.getState();
+    const b = s.borrador;
+    if (b.materias.length === 0) return true;
+    const g = s.guardados.find((x) => x.id === s.idActual);
+    if (g && JSON.stringify(g.borrador) === JSON.stringify(b)) return true;
+    return confirmar({
+      titulo: "¿Descartar el plan en edición?",
+      texto: `«${b.titulo}» tiene cambios que no se han guardado; un plan se guarda al terminar su búsqueda. Si continúas, se pierden.`,
+      aceptar: "Descartar cambios",
+    });
+  };
+
+  const quitarGuardado = (g: PlanGuardado) => {
+    setQuitado({ titulo: g.borrador.titulo, antes: guardados });
+    useStore.getState().borrarGuardado(g.id);
+  };
+
+  const abrirEjemplo = async (id: string) => {
+    if (!(await puedeDescartar())) return;
     const alumno = ESCENARIOS.alumnos.find((a) => a.id === id)!;
     // Id fijo por alumno: volver a abrir el mismo ejemplo reemplaza su plan guardado, no lo duplica.
     useStore.getState().reemplazar(borradorDeAlumno(alumno), null, `ejemplo-${alumno.id}`);
@@ -46,7 +72,8 @@ export default function Inicio() {
     router.push("/plan/resultado/");
   };
 
-  const abrirGuardado = (g: PlanGuardado) => {
+  const abrirGuardado = async (g: PlanGuardado) => {
+    if (useStore.getState().idActual !== g.id && !(await puedeDescartar())) return;
     useStore.getState().reemplazar(g.borrador, g.resultado, g.id);
     router.push(
       g.etiqueta === "sin plan"
@@ -57,7 +84,8 @@ export default function Inicio() {
     );
   };
 
-  const crearNuevo = () => {
+  const crearNuevo = async () => {
+    if (!(await puedeDescartar())) return;
     useStore.getState().reemplazar(borradorVacio());
     router.push("/plan/malla/");
   };
@@ -76,6 +104,7 @@ export default function Inicio() {
 
   return (
     <Pagina>
+      {dialogo}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-5xl sm:leading-tight">
@@ -86,7 +115,11 @@ export default function Inicio() {
             te da un plan en segundos que luego sigue mejorando.
           </p>
         </div>
-        <Boton variante="primario" className="px-6 py-3 text-base" onClick={crearNuevo}>
+        <Boton
+          variante="primario"
+          className="px-6 py-3 text-base"
+          onClick={() => void crearNuevo()}
+        >
           Crear plan nuevo
         </Boton>
       </div>
@@ -112,6 +145,17 @@ export default function Inicio() {
             </Boton>
           </div>
         </div>
+        {quitado && (
+          <AvisoDeshacer
+            alDeshacer={() => {
+              useStore.setState({ guardados: quitado.antes });
+              setQuitado(null);
+            }}
+            alCerrar={() => setQuitado(null)}
+          >
+            Se quitó «{quitado.titulo}» de los planes guardados.
+          </AvisoDeshacer>
+        )}
         {!hidratado ? (
           <p className="text-gray-500">Cargando…</p>
         ) : guardados.length === 0 ? (
@@ -130,7 +174,7 @@ export default function Inicio() {
                     <button
                       type="button"
                       className="text-left after:absolute after:inset-0 hover:underline"
-                      onClick={() => abrirGuardado(g)}
+                      onClick={() => void abrirGuardado(g)}
                     >
                       {g.borrador.titulo}
                     </button>
@@ -153,7 +197,7 @@ export default function Inicio() {
                   <button
                     type="button"
                     className="relative z-10 rounded px-2 font-sans text-gray-500 hover:text-red-700"
-                    onClick={() => useStore.getState().borrarGuardado(g.id)}
+                    onClick={() => quitarGuardado(g)}
                     aria-label={`Quitar ${g.borrador.titulo} de los guardados`}
                   >
                     Quitar
@@ -183,7 +227,7 @@ export default function Inicio() {
                       <button
                         type="button"
                         data-alumno={a.id}
-                        onClick={() => abrirEjemplo(a.id)}
+                        onClick={() => void abrirEjemplo(a.id)}
                         className="w-full rounded-xl border border-gray-200 bg-white p-4 text-left hover:border-blue-700 focus-visible:outline-2 focus-visible:outline-blue-700"
                       >
                         <div className="flex items-center justify-between gap-2">

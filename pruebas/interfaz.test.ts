@@ -7,6 +7,7 @@ import {
   clavesMeta,
   formatoCosto,
   problemaDe,
+  quitarMaterias,
 } from "../src/estado/derivados.ts";
 import { explicar } from "../src/estado/explicacion.ts";
 import { aEstrella, anytime, correrMetodo } from "../src/motor/index.ts";
@@ -121,5 +122,41 @@ describe("pantallas 7 a 9", () => {
     expect(sin).not.toContain("ISW23");
     expect(sin).not.toContain("ISW28");
     expect(sin).toContain("ISW22");
+  });
+});
+
+describe("quitar materias de la malla", () => {
+  const alumno = () => borradorDeAlumno(ESCENARIOS.alumnos.find((a) => a.id === "ISW-E2")!);
+
+  it("limpia prerrequisitos, historial y meta de las materias quitadas", () => {
+    const b = alumno();
+    b.meta.claves = ["ISW01", "ISW06"];
+    const i = b.materias.findIndex((m) => m.clave === "ISW01");
+    expect(b.estados["ISW01"]).toBe("aprobada");
+    const afectadas = quitarMaterias(b, [i]);
+    expect(b.materias.some((m) => m.clave === "ISW01")).toBe(false);
+    // ISW06, ISW10 y ISW28 dependían de ISW01.
+    expect(afectadas).toBe(3);
+    expect(b.materias.flatMap((m) => m.prerrequisitos)).not.toContain("ISW01");
+    expect(b.estados).not.toHaveProperty("ISW01");
+    expect(b.meta.claves).toEqual(["ISW06"]);
+    expect(problemaDe(b).materias).toHaveLength(27);
+  });
+
+  it("vaciar la malla deja un borrador sin materias", () => {
+    const b = alumno();
+    quitarMaterias(
+      b,
+      b.materias.map((_, i) => i),
+    );
+    expect(b.materias).toHaveLength(0);
+    expect(b.estados).toEqual({});
+  });
+
+  it("con claves repetidas, conserva las referencias a la que queda", () => {
+    const b = alumno();
+    b.materias.push({ ...b.materias[0] });
+    quitarMaterias(b, [b.materias.length - 1]);
+    expect(b.materias.find((m) => m.clave === "ISW06")!.prerrequisitos).toContain("ISW01");
   });
 });

@@ -130,7 +130,7 @@ El Código~\ref{COD::anytime} coordina las pasadas.
 \section{Interfaz y escenarios configurables}
 La interfaz tiene diez pantallas y permite cambiar en cada ejecución el escenario, el estado inicial y la meta:
 \begin{itemize}
-    \item \textbf{Plan de estudios:} elegir una de las tres mallas, editar cualquier materia (créditos, prerrequisitos, oferta), agregar materias e importar o exportar CSV. Los errores de la validación se marcan en la fila y bloquean el paso siguiente.
+    \item \textbf{Plan de estudios:} elegir una de las tres mallas o empezar con una malla en blanco, editar cualquier materia (clave, nombre, créditos, nivel, tipo, prerrequisitos y oferta), el nombre de la malla y de sus dos especialidades, agregar materias, quitar una o varias a la vez (los prerrequisitos que las usaban se limpian y la acción se puede deshacer) e importar o exportar CSV. Los errores de la validación se marcan en la fila y bloquean el paso siguiente; las acciones que reemplazan toda la malla piden confirmación.
     \item \textbf{Historial:} marcar cada materia como aprobada, reprobada o pendiente, importar un kárdex en CSV y elegir el periodo de inscripción. Esto define $(A_0, p_0)$.
     \item \textbf{Meta y parámetros:} elegir entre las cuatro metas, cambiar $C_{norm}$, $C_{max}$, $\beta$ y $K$, los pesos $H$ y el tiempo máximo (60 s, 5 min o sin límite).
     \item \textbf{Búsqueda:} una tabla que se llena en vivo con cada pasada y el botón ``Detener y quedarme con el mejor plan'', que termina el Worker en menos de un segundo.
@@ -154,4 +154,4 @@ El motor se probó contra casos con respuesta conocida, calculados con una imple
     \item \textbf{Propiedades en 200 mallas al azar} de 8 a 11 materias: el costo con poda es igual al costo sin poda, $h$ nunca supera el costo real y $h(A) \leq c(S) + h(A \cup S)$ en cada transición.
     \item \textbf{Flujos en el navegador} con Playwright: el plan de Ana Ruiz, el caso sin plan, Detener en menos de un segundo y la vista de celular sin desplazamiento horizontal.
 \end{itemize}
-En total son 97 pruebas unitarias y 4 de extremo a extremo, todas aprobadas.
+A estas se suman pruebas de las funciones de la interfaz, como quitar materias de la malla limpiando la seriación, el historial y la meta. En total son 100 pruebas unitarias y 4 de extremo a extremo, todas aprobadas.

@@ -174,3 +174,17 @@ Registro cronológico de esta versión. Cada entrada sigue el formato de abajo, 
   - Marcar en bloque en el historial (por ejemplo, «aprobar hasta el nivel N»).
   - El botón «Compartir con tutor» descarga un JSON y abre la impresión; su nombre no lo dice.
   - El límite de 31 materias del motor no se explica antes de llegar a él.
+
+## 2026-11-10 08:20 · Reporte al día con la implementación y entregables
+
+- **Hecho:** se revisó que el reporte coincida con la implementación después de los dos últimos commits de interfaz:
+  - Se regeneraron las 19 capturas con `npm run build && npm run capturas`, porque eran anteriores a los cambios de la malla, la meta, el análisis y la gráfica de créditos.
+  - Capítulo 2: la pantalla «Plan de estudios» ahora describe la malla en blanco, la edición de tipo, nivel y especialidades, quitar varias materias con «Deshacer» y las confirmaciones. El conteo de pruebas pasa de 97 a 100.
+  - Capítulo 3, caso 4: las opciones de «Sin plan posible» son las que muestra la pantalla (planear sin la materia, solicitar que se abra, cambiar la meta).
+  - Anexo de análisis: se menciona «Agregar fila».
+  - Entregables en `entregables/` (fuera de git): `RutaCuatri_Informe_Overleaf.zip` (contenido de `reporte/` con `ReporteEstancia.tex` en la raíz) y `RutaCuatri_Implementacion.zip` (`git archive` de HEAD sin `reporte/`).
+- **Decisiones:** el motor no cambió, así que los listados de `reporte/codigo/` y los experimentos siguen valiendo. Se volvió a correr `npm run experimento`: costos, expansiones y conteos son idénticos y solo cambian los tiempos. Se dejaron los CSV del equipo i5-13420H, que es el que cita el reporte.
+- **Problemas:** no hay `pdflatex` en este equipo. Tectonic (XeTeX) falla con babel en español en el caption de la heurística, así que el PDF se compila en Overleaf o con MiKTeX.
+- **Pruebas:** 100/100 Vitest, lint ok, typecheck ok, build ok.
+- **Commit:** `docs(reporte): capturas y descripción de la interfaz al día con la implementación`.
+- **Pendiente:** compilar el PDF con pdflatex y revisarlo.
